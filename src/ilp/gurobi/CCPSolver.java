@@ -1,7 +1,7 @@
 package ilp.gurobi;
 
-import java.util.Random;
-
+import common.instance.reader.CCPInstanceEntity;
+import common.instance.reader.InstanceReader;
 import gurobi.GRB;
 import gurobi.GRBEnv;
 import gurobi.GRBException;
@@ -18,25 +18,26 @@ public class CCPSolver {
     private GRBVar[][] elements;
     private double[][] edgeWeights;
     private double[] nodeWeights;
-    private double lowerBound;
-    private double upperBound;
+    private double[] lowerBound;
+    private double[] upperBound;
     
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
 	CCPSolver solver = new CCPSolver();
         solver.solve();
     }
     
-    public void solve(){
+    public void solve() throws Exception{
         try {
             env = new GRBEnv("ccpQuadratic.log");
             model = new GRBModel(env);
+            model.set(GRB.DoubleParam.TimeLimit, SolverParameters.TIME_LIMIT);
             readInstance();
             createVars();
             addObjectiveFunctionQuadratic();
             addElementOnlyOneClusterConstraint();
             addLimitsConstraint();
             model.optimize();
-            printSolution();
+            //printSolution();
         } catch (GRBException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -51,28 +52,14 @@ public class CCPSolver {
         }
     }
     
-    private void readInstance() {
-        Random r = new Random();
-        int rangeMin = 15;
-        int rangeMax = 110;
-        n = 10;
-        p = 5;
-        
-        edgeWeights = new double[n][n];
-        for(int i = 0; i < n-1; i++) {
-            for(int j = i+1; j < n; j++) {
-                edgeWeights[i][j] = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-                edgeWeights[j][i] = edgeWeights[i][j]; 
-            }
-        }
-        
-        nodeWeights = new double[n];
-        for(int i = 0; i < n; i++) {
-            nodeWeights[i] = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-        }
-        
-        lowerBound = 30;
-        upperBound = 250;
+    private void readInstance() throws Exception {
+	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, SolverParameters.INSTANCE_NAME);
+        n = instance.getN();
+	p = instance.getK();
+	edgeWeights = instance.getEdgeWeights();
+	nodeWeights = instance.getNodeWeights();
+	lowerBound = instance.getLowerBound();
+	upperBound = instance.getUpperBound();
     }
     
     private void createVars() throws GRBException{
@@ -114,8 +101,8 @@ public class CCPSolver {
             for(int i = 0; i < n; i++) {
                 expr.addTerm(nodeWeights[i], elements[i][k]);
             }
-            model.addConstr(expr, GRB.GREATER_EQUAL, lowerBound, "k_lower_" + Integer.toString(k));
-            model.addConstr(expr, GRB.LESS_EQUAL, upperBound, "k_upper_" + Integer.toString(k));
+            model.addConstr(expr, GRB.GREATER_EQUAL, lowerBound[k], "k_lower_" + Integer.toString(k));
+            model.addConstr(expr, GRB.LESS_EQUAL, upperBound[k], "k_upper_" + Integer.toString(k));
         }
     }
 }
