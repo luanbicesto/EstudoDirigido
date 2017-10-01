@@ -1,8 +1,6 @@
 package ga.ccp;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
@@ -57,38 +55,122 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
     @Override
     public CCPPopulation crossover(Population<CCPChromosome> parents) {
-	// TODO Auto-generated method stub
-	return null;
+	CCPPopulation offspring = new CCPPopulation();
+	double maxNumberLocusCrossover = 0.0;
+	
+	maxNumberLocusCrossover = instance.getN() * CCPParameters.MAX_PERCENTAGE_LOCUS_CROSSOVER;
+	for (int i = 0; i < popSize; i = i + 2) {
+	    createOffspring(parents, offspring, maxNumberLocusCrossover);
+	}
+	
+	return offspring;
+    }
+    
+    private void createOffspring(Population<CCPChromosome> parents, CCPPopulation offspring, double maxNumberLocusCrossover) {
+	int numberLocusCrossover = 0;
+	
+	CCPChromosome parent1 = parents.get(rng.nextInt(parents.size()));
+	CCPChromosome parent2 = parents.get(rng.nextInt(parents.size()));
+	CCPChromosome offspring1 = parent1.clone();
+	CCPChromosome offspring2 = parent2.clone();
+	
+	numberLocusCrossover = rng.nextInt((int)Math.round(maxNumberLocusCrossover)) + 1;	
+	for(int i = 0; i < numberLocusCrossover; i++) {
+	    crossover(parent1, offspring2);
+	    crossover(parent2, offspring1);
+	}
+	
+	offspring.add(offspring1);
+	offspring.add(offspring2);
+    }
+    
+    private void crossover(CCPChromosome parent, CCPChromosome offspring) {
+	int locusIndex = rng.nextInt(parent.getCodification().length);
+	int parentClusterId = parent.getCodification()[locusIndex];
+	try {
+	    offspring.setAllele(locusIndex, parentClusterId);
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
 
     @Override
-    public CCPPopulation mutate(Population<CCPChromosome> offsprings) {
-	// TODO Auto-generated method stub
-	return null;
+    public Population<CCPChromosome> mutate(Population<CCPChromosome> offsprings) {
+	for (CCPChromosome chromosome : offsprings) {
+	    for (int i = 0; i < chromosome.getCodification().length; i++) {
+		if (rng.nextDouble() < mutationRate) {
+		    mutateGene(chromosome, i);
+		}
+	    }
+	}
+	
+	
+	return offsprings;
+    }
+    
+    private void mutateGene(CCPChromosome chromosome, int locus) {
+	int newCluster = 0;
+
+	newCluster = rng.nextInt(instance.getK());
+	try {
+	    chromosome.setAllele(locus, newCluster);
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
 
     @Override
-    public CCPPopulation selectNextPopulation(Population<CCPChromosome> mutants) {
-	// TODO Auto-generated method stub
-	return null;
+    public Population<CCPChromosome> selectNextPopulation(Population<CCPChromosome> offsprings) {
+	CCPChromosome worst = (CCPChromosome) getWorstChromosome(offsprings);
+
+	if (worst.getFitness() < bestChromosome.getFitness()) {
+	    offsprings.remove(worst);
+	    offsprings.add((CCPChromosome) bestChromosome);
+	}
+
+	return offsprings;
     }
     
     private CCPChromosome generateRandomChromosome() throws Exception {
-	CCPChromosome chromosome = new CCPChromosome(instance.getN(), instance.getEdgeWeights());
-	ArrayList<Set<Integer>> nodesByCluster = new ArrayList<>(instance.getK());
+	CCPChromosome chromosome = new CCPChromosome(instance);
+	ArrayList<ArrayList<Integer>> nodesByCluster = new ArrayList<>(instance.getK());
+	ArrayList<Double> clustersCurrentWeight = new ArrayList<>(instance.getK());
 	
 	for(int i = 0; i < instance.getK(); i++) {
-	    nodesByCluster.add(i, new HashSet<Integer>());
+	    nodesByCluster.add(i, new ArrayList<Integer>());
+	    clustersCurrentWeight.add(i, 0.0);
 	}
 	
 	for(int i = 0; i < instance.getN(); i++) {
-	    int clusterId = rng.nextInt(instance.getK());
+	    int clusterId = getNextAvailableClusterId(i, clustersCurrentWeight);
 	    chromosome.getCodification()[i] = clusterId;
 	    nodesByCluster.get(clusterId).add(i);
+	    clustersCurrentWeight.set(clusterId, clustersCurrentWeight.get(clusterId) + instance.getNodeWeights()[i]);
 	}
-	chromosome.setFitness(nodesByCluster);
+	chromosome.initialize(nodesByCluster, clustersCurrentWeight);
 	
 	return chromosome;
+    }
+    
+    //TODO: Exception when no cluster is available
+    private int getNextAvailableClusterId(int nodeIndex, ArrayList<Double> clustersCurrentWeight) throws Exception {
+	int clusterId = 0;
+	double clusterWeight = 0.0;
+	double targetClusterWeight = 0.0;
+	
+	clusterId = rng.nextInt(instance.getK());
+	clusterWeight = clustersCurrentWeight.get(clusterId);
+	targetClusterWeight = clusterWeight + instance.getNodeWeights()[nodeIndex];  
+	
+	while(Common.isClusterOverWeighted(clusterId, targetClusterWeight, instance)) {
+	    clusterId = (clusterId + 1) % instance.getK();
+	    clusterWeight = clustersCurrentWeight.get(clusterId);
+	    targetClusterWeight = clusterWeight + instance.getNodeWeights()[nodeIndex];
+	}
+	
+	return clusterId;
     }
     
     private CCPPopulation selectParentsByTournament(CCPPopulation population) {

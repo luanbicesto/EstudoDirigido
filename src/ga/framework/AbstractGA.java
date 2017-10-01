@@ -8,6 +8,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 
     protected int generations;
     protected int popSize;
+    protected double mutationRate;
     protected Chromosome bestChromosome;
     protected final Random rng = new Random(0);
     private boolean verbose = true;
@@ -16,11 +17,12 @@ public abstract class AbstractGA<C extends Chromosome> {
     public abstract Population<C> selectParents(Population<C> population);
     public abstract Population<C> crossover(Population<C> parents);
     public abstract Population<C> mutate(Population<C> offsprings);
-    public abstract Population<C> selectNextPopulation(Population<C> mutants);
+    public abstract Population<C> selectNextPopulation(Population<C> offsprings);
     
     public AbstractGA() {
 	this.generations = GAConfiguration.NUMBER_GENERATIONS;
 	this.popSize = GAConfiguration.POPULATION_SIZE;
+	this.mutationRate = GAConfiguration.MUTATION_RATE;
     }
     
     public Chromosome solve() {
@@ -48,6 +50,15 @@ public abstract class AbstractGA<C extends Chromosome> {
     }
     
     protected Chromosome getBestChromosome(Population<C> population) {
+	return Collections.max(population, new Comparator<Chromosome>() {
+	    @Override
+	    public int compare(Chromosome o1, Chromosome o2) {
+		return Double.compare(o1.getFitness(), o2.getFitness());
+	    }
+	});
+    }
+    
+    protected Chromosome getWorstChromosome(Population<C> population) {
 	return Collections.min(population, new Comparator<Chromosome>() {
 	    @Override
 	    public int compare(Chromosome o1, Chromosome o2) {
