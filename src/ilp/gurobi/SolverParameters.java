@@ -1,6 +1,6 @@
 package ilp.gurobi;
 
 public class SolverParameters {
-    public static String INSTANCE_NAME = "RanReal240_01.txt";
-    public static int TIME_LIMIT = 1800;
+    public static final String INSTANCE_NAME = "RanReal240_01.txt";
+    public static final int TIME_LIMIT = 1800;
 }

@@ -2,7 +2,7 @@ package ga.framework;
 
 import java.util.ArrayList;
 
-public abstract class Population extends ArrayList<Chromosome> {
+public abstract class Population<C extends Chromosome> extends ArrayList<C> {
 
     /**
      * 
