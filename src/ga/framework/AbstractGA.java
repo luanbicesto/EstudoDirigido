@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import ga.ccp.CCPChromosome;
+
 public abstract class AbstractGA<C extends Chromosome> {
 
     protected int generations;
@@ -26,6 +28,7 @@ public abstract class AbstractGA<C extends Chromosome> {
     }
     
     public Chromosome solve() {
+	long startTime = System.currentTimeMillis();
 	Chromosome offspringBestChromosome;
 	/* starts the initial population */
 	Population<C> population = initializePopulation();
@@ -42,10 +45,16 @@ public abstract class AbstractGA<C extends Chromosome> {
 		bestChromosome = offspringBestChromosome;
 		if (verbose) {
 		    System.out.println("(Gen. " + g + ") BestSol = " + bestChromosome.getFitness());
+		    if(g == 31936) {
+			((CCPChromosome)bestChromosome).verifyFitness();
+		    }
 		}
 	    }
 	}
 	
+	long endTime = System.currentTimeMillis();
+	long totalTime = endTime - startTime;
+	System.out.println("Time = " + (double) totalTime / (double) 1000 + " seg");
 	return bestChromosome;
     }
     

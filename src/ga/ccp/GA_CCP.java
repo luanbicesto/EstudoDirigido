@@ -79,7 +79,9 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	    crossover(parent1, offspring2);
 	    crossover(parent2, offspring1);
 	}
-	
+
+	//offspring2.setFitness();
+	//offspring1.setFitness();
 	offspring.add(offspring1);
 	offspring.add(offspring2);
     }
@@ -97,15 +99,21 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
     @Override
     public Population<CCPChromosome> mutate(Population<CCPChromosome> offsprings) {
+	boolean chromosomeChanged;
 	for (CCPChromosome chromosome : offsprings) {
+	    chromosomeChanged = false;
 	    for (int i = 0; i < chromosome.getCodification().length; i++) {
 		if (rng.nextDouble() < mutationRate) {
+		    chromosomeChanged = true;
 		    mutateGene(chromosome, i);
 		}
 	    }
+
+	    if (chromosomeChanged) {
+		//chromosome.setFitness();
+	    }
 	}
-	
-	
+
 	return offsprings;
     }
     
