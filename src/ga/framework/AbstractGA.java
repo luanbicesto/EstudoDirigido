@@ -45,13 +45,11 @@ public abstract class AbstractGA<C extends Chromosome> {
 		bestChromosome = offspringBestChromosome;
 		if (verbose) {
 		    System.out.println("(Gen. " + g + ") BestSol = " + bestChromosome.getFitness());
-		    if(g == 31936) {
-			((CCPChromosome)bestChromosome).verifyFitness();
-		    }
 		}
 	    }
 	}
 	
+	((CCPChromosome)bestChromosome).verifyFitness();
 	long endTime = System.currentTimeMillis();
 	long totalTime = endTime - startTime;
 	System.out.println("Time = " + (double) totalTime / (double) 1000 + " seg");

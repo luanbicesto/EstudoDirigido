@@ -85,12 +85,7 @@ public class CCPChromosome extends Chromosome {
 	double fitness = 0.0;
 	for(int i = 0; i < nodesByCluster.size(); i++) {
 	    ArrayList<Integer> nodesClusterList = nodesByCluster.get(i);
-	    
-	    for(int j = 0; j < nodesClusterList.size(); j++) {
-		for(int k = j+1; k < nodesClusterList.size(); k++) {
-		    fitness += Math.round(this.instance.getEdgeWeights()[nodesClusterList.get(j)][nodesClusterList.get(k)]);
-		}
-	    }
+	    fitness += computeCusterContribution(nodesClusterList);
 	}
 	
 	this.fitness = fitness;
@@ -108,7 +103,7 @@ public class CCPChromosome extends Chromosome {
 	
 	for(int i = 0; i < nodesCluster.size(); i++) {
 	    if(nodesCluster.get(i) != locus) {
-		nodeContribution += Math.round(this.instance.getEdgeWeights()[locus][nodesCluster.get(i)]);
+		nodeContribution += getEdgeValue(locus, nodesCluster.get(i));
 	    }
 	}
 	
@@ -119,14 +114,6 @@ public class CCPChromosome extends Chromosome {
 	double fitness = computeFitness(false);
 	this.fitness = fitness;
     }
-
-    public void verifyFitness() {
-	double fitness = 0.0;
-	
-	fitness = computeFitness(true);
-	System.out.println("Current fitness: " + this.fitness + " | Calculated: " + fitness);
-    }
-    
     
     private double computeFitness(boolean computeFromScratch) {
 	double fitness = 0.0;
@@ -139,13 +126,18 @@ public class CCPChromosome extends Chromosome {
     
     private double computeClusterContribution(int clusterId, boolean computeFromScratch) {
 	ArrayList<Integer> clusterNodes;
-	double clusterContribution = 0.0;
 	
 	clusterNodes = getNodesOfCluster(clusterId, computeFromScratch);
+	return computeCusterContribution(clusterNodes);
+    }
+    
+    private double computeCusterContribution(ArrayList<Integer> clusterNodes) {
+	double clusterContribution = 0.0;
+	
 	for(int i = 0; i < clusterNodes.size(); i++) {
 	    for(int j = i + 1; j < clusterNodes.size(); j++) {
 		try {
-		    clusterContribution += Math.round(instance.getEdgeWeights()[clusterNodes.get(i)][clusterNodes.get(j)]);
+		    clusterContribution += getEdgeValue(clusterNodes.get(i), clusterNodes.get(j));
 		} catch (Exception e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
@@ -170,6 +162,44 @@ public class CCPChromosome extends Chromosome {
 	}
 
 	return nodes;
+    }
+    
+    private double getEdgeValue(int i, int j) {
+	try {
+	    return instance.getEdgeWeights()[i][j];
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	return 0.0;
+    }
+    
+
+    public void verifyFitness() {
+	double fitness = 0.0;
+	
+	fitness = computeFitness(true);
+	System.out.println("Current fitness: " + this.fitness + " | Calculated: " + fitness);
+	System.out.println("Clusters weights are valid: " + isClustersWeightsValid());
+    }
+    
+    private boolean isClustersWeightsValid() {
+	boolean validClustersWeights = true;
+	
+	for(int i = 0; i < this.clustersCurrentWeight.size(); i++) {
+	    try {
+		if(Common.isClusterOverWeighted(i, clustersCurrentWeight.get(i), this.instance) ||
+		   Common.isClusterUnderWeighted(i, clustersCurrentWeight.get(i), this.instance)) {
+		    validClustersWeights = false;
+		    break;
+		}
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+	
+	return validClustersWeights;
     }
     
 }
