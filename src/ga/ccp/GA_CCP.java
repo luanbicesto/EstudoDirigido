@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
+import ga.ccp.CCPParameters.LocalSearchStrategy;
 import ga.framework.AbstractGA;
 import ga.framework.Population;
 
 public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     private CCPInstanceEntity instance;
+    private LocalSearchWrapper localSearch;
     
     public static void main(String[] args) throws Exception {
 	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, CCPParameters.INSTANCE_NAME);
@@ -20,6 +22,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     public GA_CCP(CCPInstanceEntity instance) {
 	super();
 	this.instance = instance;
+	this.localSearch = new LocalSearchWrapper(instance, rng);
     }
 
     @Override
@@ -115,6 +118,11 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	}
 
 	return offsprings;
+    }
+    
+    @Override
+    public void applyLocalSearch(CCPChromosome chromosome) {
+	localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome);
     }
     
     private void mutateGene(CCPChromosome chromosome, int locus) {

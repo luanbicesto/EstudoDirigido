@@ -1,0 +1,150 @@
+package ga.ccp;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import common.instance.reader.CCPInstanceEntity;
+import ga.ccp.CCPParameters.LocalSearchStrategy;
+
+public class LocalSearchWrapper {
+    
+    private ArrayList<Integer> allNodesIndices;
+    private Random rng;
+    private CCPInstanceEntity instance;
+    
+    public LocalSearchWrapper(CCPInstanceEntity instance, Random rng) {
+	allNodesIndices = new ArrayList<>();
+	
+	for(int i = 0; i < instance.getN(); i++) {
+	    allNodesIndices.add(i);
+	}
+	
+	this.rng = rng;
+	this.instance = instance;
+    }
+    
+    public void applyLocalSearch(LocalSearchStrategy localSearchStrategy, CCPChromosome chromosome) {
+	switch (localSearchStrategy) {
+	case Swap:
+	    try {
+		applySwap(chromosome);
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    break;
+
+	default:
+	    break;
+	}
+    }
+    
+    private void applySwap(CCPChromosome chromosome) throws Exception {
+	int node1 = 0;
+	int indexNode = 0;
+	ArrayList<Integer> allNodesIndicesCopy = new ArrayList<>(allNodesIndices);
+	double swapImprovement = 0.0;
+	double bestSwapImprovement = 0.0;
+	int swapNode = -1;
+	
+	while(allNodesIndicesCopy.size() > 0) {
+	    indexNode = rng.nextInt(allNodesIndicesCopy.size());
+	    node1 = allNodesIndicesCopy.get(indexNode);
+	    swapImprovement = 0.0;
+	    swapNode = -1;
+	    bestSwapImprovement = 0.0;
+	    
+	    for(int node2 = 0; node2 < instance.getN(); node2++) {
+		if(node1 != node2) {
+		    swapImprovement = computeSwapImprovement(node1, node2, chromosome);
+		    if(swapImprovement > 0) {
+			swapNode = node2;
+			bestSwapImprovement = swapImprovement;
+			break;
+		    }
+		}
+	    }
+	    
+	    if(swapNode != -1) {
+		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
+		allNodesIndicesCopy.remove(new Integer(swapNode));
+	    }
+	    
+	    allNodesIndicesCopy.remove(new Integer(node1));
+	}
+	//chromosome.verifyFitness();
+    }
+    
+    private void swapNodes(int node1, int node2, double swapImprovement, CCPChromosome chromosome) throws Exception {
+	double[] nodeWeight = new double[2];
+	double[] futureClustersWeight = new double[2];
+	int[] clusterOfNodes = {0,0};
+	
+	clusterOfNodes[0] = chromosome.getCodification()[node1];
+	clusterOfNodes[1] = chromosome.getCodification()[node2];
+	nodeWeight[0] = instance.getNodeWeights()[node1];
+	nodeWeight[1] = instance.getNodeWeights()[node2];
+	futureClustersWeight[0] = chromosome.getCurrentClustersWeight().get(clusterOfNodes[0]) - nodeWeight[0] + nodeWeight[1];
+	futureClustersWeight[1] = chromosome.getCurrentClustersWeight().get(clusterOfNodes[1]) + nodeWeight[0] - nodeWeight[1];
+	
+	chromosome.getCodification()[node1] = clusterOfNodes[1];
+	chromosome.getCodification()[node2] = clusterOfNodes[0];
+	chromosome.addToFitness(swapImprovement);
+	chromosome.getCurrentClustersWeight().set(clusterOfNodes[0], futureClustersWeight[0]);
+	chromosome.getCurrentClustersWeight().set(clusterOfNodes[1], futureClustersWeight[1]);
+	swapNodesByCluster(node1, node2, clusterOfNodes[0], clusterOfNodes[1], chromosome);
+    }
+    
+    private void swapNodesByCluster(Integer node1, Integer node2, int clusterNode1, int clusterNode2, CCPChromosome chromosome) {
+	chromosome.getNodesByCluster().get(clusterNode1).remove(node1);
+	chromosome.getNodesByCluster().get(clusterNode2).remove(node2);
+	chromosome.getNodesByCluster().get(clusterNode1).add(node2);
+	chromosome.getNodesByCluster().get(clusterNode2).add(node1);
+    }
+    
+    private double computeSwapImprovement(int node1, int node2, CCPChromosome chromosome) {
+	double swapImprovement = 0.0;
+	int[] clusterOfNodes = {0,0};
+	double[] originalContribution = {0.0, 0.0};
+	double[] newContribution = {0.0, 0.0};
+	
+	try {
+	    clusterOfNodes[0] = chromosome.getCodification()[node1];
+	    clusterOfNodes[1] = chromosome.getCodification()[node2];
+
+	    if(canSwapNodes(node1, node2, chromosome, clusterOfNodes)) {
+		originalContribution[0] = chromosome.computeNodeContributionInCluster(node1);
+		originalContribution[1] = chromosome.computeNodeContributionInCluster(node2);
+		chromosome.getCodification()[node1] = clusterOfNodes[1];
+		chromosome.getCodification()[node2] = clusterOfNodes[0];
+		swapNodesByCluster(node1, node2, clusterOfNodes[0], clusterOfNodes[1], chromosome);
+		newContribution[0] = chromosome.computeNodeContributionInCluster(node1);
+		newContribution[1] = chromosome.computeNodeContributionInCluster(node2);
+		chromosome.getCodification()[node1] = clusterOfNodes[0];
+		chromosome.getCodification()[node2] = clusterOfNodes[1];
+		swapNodesByCluster(node2, node1, clusterOfNodes[0], clusterOfNodes[1], chromosome);
+		swapImprovement = ((originalContribution[0] + originalContribution[1]) * -1) + newContribution[0] + newContribution[1]; 
+	    }
+	    
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	
+	return swapImprovement;
+    }
+    
+    private boolean canSwapNodes(int node1, int node2, CCPChromosome chromosome, int[] clusterOfNodes) throws Exception {
+	double[] nodeWeight = new double[2];
+	double[] futureClustersWeight = new double[2];
+	
+	nodeWeight[0] = instance.getNodeWeights()[node1];
+	nodeWeight[1] = instance.getNodeWeights()[node2];
+	
+	futureClustersWeight[0] = chromosome.getCurrentClustersWeight().get(clusterOfNodes[0]) - nodeWeight[0] + nodeWeight[1];
+	futureClustersWeight[1] = chromosome.getCurrentClustersWeight().get(clusterOfNodes[1]) + nodeWeight[0] - nodeWeight[1];
+	
+	return Common.isClusterWithinWeights(clusterOfNodes[0], futureClustersWeight[0], instance) &&
+	       Common.isClusterWithinWeights(clusterOfNodes[1], futureClustersWeight[1], instance);
+    }
+}

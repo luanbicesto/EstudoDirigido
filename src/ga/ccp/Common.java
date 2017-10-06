@@ -11,4 +11,8 @@ public class Common {
     public static boolean isClusterUnderWeighted(int clusterId, double targetClusterWeight, CCPInstanceEntity instance) throws Exception {
 	return Double.compare(targetClusterWeight, instance.getLowerBound()[clusterId]) < 0;
     }
+    
+    public static boolean isClusterWithinWeights(int clusterId, double targetClusterWeight, CCPInstanceEntity instance) throws Exception {
+	return !isClusterUnderWeighted(clusterId, targetClusterWeight, instance) && !isClusterOverWeighted(clusterId, targetClusterWeight, instance);
+    }
 }

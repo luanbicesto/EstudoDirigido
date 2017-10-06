@@ -20,6 +20,7 @@ public abstract class AbstractGA<C extends Chromosome> {
     public abstract Population<C> crossover(Population<C> parents);
     public abstract Population<C> mutate(Population<C> offsprings);
     public abstract Population<C> selectNextPopulation(Population<C> offsprings);
+    public abstract void applyLocalSearch(C chromosome);
     
     public AbstractGA() {
 	this.generations = GAConfiguration.NUMBER_GENERATIONS;
@@ -29,18 +30,23 @@ public abstract class AbstractGA<C extends Chromosome> {
     
     public Chromosome solve() {
 	long startTime = System.currentTimeMillis();
-	Chromosome offspringBestChromosome;
+	C offspringBestChromosome;
 	/* starts the initial population */
 	Population<C> population = initializePopulation();
 	bestChromosome = getBestChromosome(population);
 	
 	for (int g = 1; g <= generations; g++) {
+	    applyLocalSearch(population);
 	    Population<C> parents = selectParents(population);
 	    Population<C> offsprings = crossover(parents);
 	    Population<C> mutants = mutate(offsprings);
 	    Population<C> newpopulation = selectNextPopulation(mutants);
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);
+	    
+	    if(GAConfiguration.ENABLE_HYBRID_POPULATION && GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
+		applyLocalSearch(offspringBestChromosome);
+	    }
 	    if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
 		bestChromosome = offspringBestChromosome;
 		if (verbose) {
@@ -56,7 +62,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	return bestChromosome;
     }
     
-    protected Chromosome getBestChromosome(Population<C> population) {
+    protected C getBestChromosome(Population<C> population) {
 	return Collections.max(population, new Comparator<Chromosome>() {
 	    @Override
 	    public int compare(Chromosome o1, Chromosome o2) {
@@ -72,5 +78,22 @@ public abstract class AbstractGA<C extends Chromosome> {
 		return Double.compare(o1.getFitness(), o2.getFitness());
 	    }
 	});
+    }
+
+    private void applyLocalSearch(Population<C> population) {
+	int chromosomeIndex = 0;
+	C chromosome = null;
+	int numberHybridCromossomes = 0;
+	
+	if (GAConfiguration.ENABLE_HYBRID_POPULATION && 
+	    rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
+	    numberHybridCromossomes = (((CCPChromosome)bestChromosome).getCodification().length * GAConfiguration.PERCENTAGE_HYBRID_POPULATION) / 100;
+	    
+	    for (int i = 0; i < numberHybridCromossomes; i++) {
+		chromosomeIndex = rng.nextInt(population.size());
+		chromosome = population.get(chromosomeIndex);
+		applyLocalSearch(chromosome);
+	    }
+	}
     }
 }

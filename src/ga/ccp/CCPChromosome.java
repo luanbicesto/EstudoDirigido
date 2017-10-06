@@ -53,6 +53,20 @@ public class CCPChromosome extends Chromosome {
 	return clone;
     }
     
+    public void removeNodeFromCluster(int locus) throws Exception {
+	double nodeContribution = 0.0;
+	double currentClusterWeight = 0.0;
+	int clusterId = 0;
+	
+	nodeContribution = computeNodeContributionInCluster(locus);
+	currentClusterWeight = this.clustersCurrentWeight.get(clusterId);
+	clusterId = this.codification[locus];
+	this.nodesByCluster.get(clusterId).remove(new Integer(locus));
+	this.clustersCurrentWeight.set(clusterId, currentClusterWeight - instance.getNodeWeights()[locus]);
+	this.fitness = this.fitness - nodeContribution;
+	this.codification[locus] = -1;
+    }
+    
     public void setAllele(int locus, Integer targetClusterId) throws Exception {
 	int originalClusterId = 0;
 	double targetClusterWeight = 0.0;
@@ -61,24 +75,39 @@ public class CCPChromosome extends Chromosome {
 	originalClusterId = this.getCodification()[locus];
 	originalClusterFutureWeight = this.clustersCurrentWeight.get(originalClusterId) - this.instance.getNodeWeights()[locus];
 	targetClusterWeight = this.clustersCurrentWeight.get(targetClusterId) + this.instance.getNodeWeights()[locus];
-	if(originalClusterId != targetClusterId &&
-	   !Common.isClusterOverWeighted(targetClusterId, targetClusterWeight, instance) &&
-	   !Common.isClusterUnderWeighted(originalClusterId, originalClusterFutureWeight, instance)) {
+	if (originalClusterId != targetClusterId
+		&& !Common.isClusterOverWeighted(targetClusterId, targetClusterWeight, instance)
+		&& !Common.isClusterUnderWeighted(originalClusterId, originalClusterFutureWeight, instance)) {
 	    double previousContribution = 0.0;
 	    double currentContribution = 0.0;
-	    
-	    //Update fitness and adjust nodes by cluster
+
+	    // Update fitness and adjust nodes by cluster
 	    previousContribution = computeNodeContributionInCluster(locus);
 	    this.getCodification()[locus] = targetClusterId;
 	    this.nodesByCluster.get(originalClusterId).remove(new Integer(locus));
 	    this.nodesByCluster.get(targetClusterId).add(new Integer(locus));
 	    currentContribution = computeNodeContributionInCluster(locus);
 	    this.fitness = this.fitness - previousContribution + currentContribution;
-	    
-	    //Update weights of the clusters
+
+	    // Update weights of the clusters
 	    this.clustersCurrentWeight.set(originalClusterId, originalClusterFutureWeight);
 	    this.clustersCurrentWeight.set(targetClusterId, targetClusterWeight);
 	}
+    }
+    
+    public boolean canSetAllele(int locus, Integer targetClusterId) throws Exception {
+	int originalClusterId = 0;
+	double targetClusterWeight = 0.0;
+	double originalClusterFutureWeight = 0.0;
+
+	originalClusterId = this.getCodification()[locus];
+	originalClusterFutureWeight = this.clustersCurrentWeight.get(originalClusterId)
+		- this.instance.getNodeWeights()[locus];
+	targetClusterWeight = this.clustersCurrentWeight.get(targetClusterId) + this.instance.getNodeWeights()[locus];
+
+	return originalClusterId != targetClusterId
+		&& !Common.isClusterOverWeighted(targetClusterId, targetClusterWeight, instance)
+		&& !Common.isClusterUnderWeighted(originalClusterId, originalClusterFutureWeight, instance);
     }
     
     public void initialize(ArrayList<ArrayList<Integer>> nodesByCluster, ArrayList<Double> clustersCurrentWeight) throws Exception {
@@ -93,7 +122,7 @@ public class CCPChromosome extends Chromosome {
 	this.clustersCurrentWeight = clustersCurrentWeight;
     }
     
-    private double computeNodeContributionInCluster(int locus) throws Exception {
+    public double computeNodeContributionInCluster(int locus) throws Exception {
 	int nodeClusterId = 0;
 	ArrayList<Integer> nodesCluster = null;
 	double nodeContribution = 0.0;
@@ -113,6 +142,10 @@ public class CCPChromosome extends Chromosome {
     public void setFitness() {
 	double fitness = computeFitness(false);
 	this.fitness = fitness;
+    }
+    
+    public void addToFitness(double improvement) {
+	this.fitness += improvement;
     }
     
     private double computeFitness(boolean computeFromScratch) {
