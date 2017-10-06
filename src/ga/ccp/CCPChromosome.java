@@ -161,7 +161,25 @@ public class CCPChromosome extends Chromosome {
 	ArrayList<Integer> clusterNodes;
 	
 	clusterNodes = getNodesOfCluster(clusterId, computeFromScratch);
+	printClusterWeight(clusterId, clusterNodes);
 	return computeCusterContribution(clusterNodes);
+    }
+    
+    private void printClusterWeight(int clusterId, ArrayList<Integer> clusterNodes) {
+	double totalWeight = 0.0;
+	int nodeId = 0;
+	
+	for(int i = 0; i < clusterNodes.size(); i++) {
+	    nodeId = clusterNodes.get(i);
+	    try {
+		totalWeight += instance.getNodeWeights()[nodeId];
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+	
+	System.out.println("Node weight: " + clusterId + " -> " + totalWeight);
     }
     
     private double computeCusterContribution(ArrayList<Integer> clusterNodes) {
@@ -214,6 +232,7 @@ public class CCPChromosome extends Chromosome {
 	fitness = computeFitness(true);
 	System.out.println("Current fitness: " + this.fitness + " | Calculated: " + fitness);
 	System.out.println("Clusters weights are valid: " + isClustersWeightsValid());
+	System.out.println(clustersCurrentWeight.toString());
     }
     
     private boolean isClustersWeightsValid() {

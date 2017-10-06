@@ -40,7 +40,7 @@ public class LocalSearchWrapper {
     }
     
     private void applySwap(CCPChromosome chromosome) throws Exception {
-	int node1 = 0;
+	int node1 = 0, node2 = 0;
 	int indexNode = 0;
 	ArrayList<Integer> allNodesIndicesCopy = new ArrayList<>(allNodesIndices);
 	double swapImprovement = 0.0;
@@ -54,7 +54,9 @@ public class LocalSearchWrapper {
 	    swapNode = -1;
 	    bestSwapImprovement = 0.0;
 	    
-	    for(int node2 = 0; node2 < instance.getN(); node2++) {
+	    for(int j = 0; j < allNodesIndicesCopy.size(); j++) {
+		indexNode = rng.nextInt(allNodesIndicesCopy.size());
+		node2 = allNodesIndicesCopy.get(indexNode);
 		if(node1 != node2) {
 		    swapImprovement = computeSwapImprovement(node1, node2, chromosome);
 		    if(swapImprovement > 0) {
@@ -68,6 +70,7 @@ public class LocalSearchWrapper {
 	    if(swapNode != -1) {
 		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
 		allNodesIndicesCopy.remove(new Integer(swapNode));
+		break;
 	    }
 	    
 	    allNodesIndicesCopy.remove(new Integer(node1));
@@ -131,6 +134,7 @@ public class LocalSearchWrapper {
 	    e.printStackTrace();
 	}
 	
+	//chromosome.verifyFitness();
 	return swapImprovement;
     }
     
@@ -145,6 +149,7 @@ public class LocalSearchWrapper {
 	futureClustersWeight[1] = chromosome.getCurrentClustersWeight().get(clusterOfNodes[1]) + nodeWeight[0] - nodeWeight[1];
 	
 	return Common.isClusterWithinWeights(clusterOfNodes[0], futureClustersWeight[0], instance) &&
-	       Common.isClusterWithinWeights(clusterOfNodes[1], futureClustersWeight[1], instance);
+	       Common.isClusterWithinWeights(clusterOfNodes[1], futureClustersWeight[1], instance) &&
+	       clusterOfNodes[0] != clusterOfNodes[1];
     }
 }

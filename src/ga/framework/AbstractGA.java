@@ -11,8 +11,9 @@ public abstract class AbstractGA<C extends Chromosome> {
     protected int generations;
     protected int popSize;
     protected double mutationRate;
-    protected Chromosome bestChromosome;
+    protected C bestChromosome;
     protected final Random rng = new Random(0);
+    protected final Random rng2 = new Random(1);
     private boolean verbose = true;
     
     public abstract Population<C> initializePopulation();
@@ -44,7 +45,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);
 	    
-	    if(GAConfiguration.ENABLE_HYBRID_POPULATION && GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
+	    if(GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
 		applyLocalSearch(offspringBestChromosome);
 	    }
 	    if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
@@ -55,6 +56,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    }
 	}
 	
+	applyLocalSearch(bestChromosome);
 	((CCPChromosome)bestChromosome).verifyFitness();
 	long endTime = System.currentTimeMillis();
 	long totalTime = endTime - startTime;
@@ -86,9 +88,8 @@ public abstract class AbstractGA<C extends Chromosome> {
 	int numberHybridCromossomes = 0;
 	
 	if (GAConfiguration.ENABLE_HYBRID_POPULATION && 
-	    rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
-	    numberHybridCromossomes = (((CCPChromosome)bestChromosome).getCodification().length * GAConfiguration.PERCENTAGE_HYBRID_POPULATION) / 100;
-	    
+	    rng2.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
+	    numberHybridCromossomes = GAConfiguration.ABSOLUTE_HYBRID_POPULATION;
 	    for (int i = 0; i < numberHybridCromossomes; i++) {
 		chromosomeIndex = rng.nextInt(population.size());
 		chromosome = population.get(chromosomeIndex);
