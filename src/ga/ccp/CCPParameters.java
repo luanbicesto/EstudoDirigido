@@ -17,5 +17,6 @@ public class CCPParameters {
 	Swap,
 	OneChange
     }
+    /*Local Search*/
     
 }

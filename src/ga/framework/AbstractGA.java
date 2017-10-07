@@ -40,7 +40,10 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    applyLocalSearch(population);
 	    Population<C> parents = selectParents(population);
 	    Population<C> offsprings = crossover(parents);
-	    Population<C> mutants = mutate(offsprings);
+	    Population<C> mutants = offsprings;
+	    if(GAConfiguration.ENABLE_MUTATION) {
+		mutants = mutate(offsprings);
+	    }
 	    Population<C> newpopulation = selectNextPopulation(mutants);
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);

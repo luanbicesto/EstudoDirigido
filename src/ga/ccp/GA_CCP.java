@@ -6,12 +6,14 @@ import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
 import ga.ccp.CCPParameters.LocalSearchStrategy;
 import ga.framework.AbstractGA;
+import ga.framework.GAConfiguration;
 import ga.framework.Population;
 
 public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     private CCPInstanceEntity instance;
     private LocalSearchWrapper localSearch;
+    private CCPPopulation bufferNewIndividuals;
     
     public static void main(String[] args) throws Exception {
 	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, CCPParameters.INSTANCE_NAME);
@@ -23,6 +25,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	super();
 	this.instance = instance;
 	this.localSearch = new LocalSearchWrapper(instance, rng);
+	this.bufferNewIndividuals = new CCPPopulation();
     }
 
     @Override
@@ -36,8 +39,20 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		e.printStackTrace();
 	    }
 	}
+	
+	//initializeBufferIndividuals();
 
 	return newPopulation;
+    }
+    
+    private void initializeBufferIndividuals() {
+	while (bufferNewIndividuals.size() < popSize * GAConfiguration.TIMES_SIZE_NEW_POPULATION) {
+	    try {
+		bufferNewIndividuals.add(generateRandomChromosome());
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
     }
 
     @Override
@@ -73,7 +88,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	int numberLocusCrossover = 0;
 	
 	CCPChromosome parent1 = parents.get(rng.nextInt(parents.size()));
-	CCPChromosome parent2 = parents.get(rng.nextInt(parents.size()));
+	CCPChromosome parent2 = getSecondParent(parents, bufferNewIndividuals);
 	CCPChromosome offspring1 = parent1.clone();
 	CCPChromosome offspring2 = parent2.clone();
 	
@@ -87,6 +102,23 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	//offspring1.setFitness();
 	offspring.add(offspring1);
 	offspring.add(offspring2);
+    }
+    
+    private CCPChromosome getSecondParent(Population<CCPChromosome> parents, CCPPopulation newPopulation) {
+	CCPChromosome parent2 = parents.get(rng.nextInt(parents.size()));
+	
+	if(GAConfiguration.ENABLE_NEW_POPULATION &&
+	   rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION) {
+	    //parent2 = newPopulation.get(rng.nextInt(newPopulation.size()));
+	    try {
+		parent2 = generateRandomChromosome();
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+	
+	return parent2;
     }
     
     private void crossover(CCPChromosome parent, CCPChromosome offspring) {
