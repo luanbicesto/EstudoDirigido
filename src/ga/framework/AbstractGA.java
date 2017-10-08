@@ -26,7 +26,7 @@ public abstract class AbstractGA<C extends Chromosome> {
     public abstract Population<C> crossover(Population<C> parents);
     public abstract Population<C> mutate(Population<C> offsprings);
     public abstract Population<C> selectNextPopulation(Population<C> offsprings);
-    public abstract void applyLocalSearch(C chromosome);
+    public abstract void applyLocalSearch(C chromosome, boolean applyToAllNodes);
     
     public AbstractGA() {
 	this.generations = GAConfiguration.NUMBER_GENERATIONS;
@@ -69,7 +69,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    offspringBestChromosome = getBestChromosome(population);
 	    
 	    if(GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
-		applyLocalSearch(offspringBestChromosome);
+		applyLocalSearch(offspringBestChromosome, false);
 	    }
 	    if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
 		/*if(offspringBestChromosome.getFitness() - bestChromosome.getFitness() < GAConfiguration.MINIMUM_IMPROVEMENT) {
@@ -98,7 +98,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    }
 	}
 	
-	applyLocalSearch(bestChromosome);
+	applyLocalSearch(bestChromosome, true);
 	((CCPChromosome)bestChromosome).verifyFitness();
 	long endTime = System.currentTimeMillis();
 	long totalTime = endTime - startTime;
@@ -135,7 +135,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    for (int i = 0; i < numberHybridCromossomes; i++) {
 		chromosomeIndex = rng.nextInt(population.size());
 		chromosome = population.get(chromosomeIndex);
-		applyLocalSearch(chromosome);
+		applyLocalSearch(chromosome, false);
 	    }
 	}
     }

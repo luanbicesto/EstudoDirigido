@@ -29,11 +29,11 @@ public class LocalSearchWrapper {
 	this.instance = instance;
     }
     
-    public void applyLocalSearch(LocalSearchStrategy localSearchStrategy, CCPChromosome chromosome) {
+    public void applyLocalSearch(LocalSearchStrategy localSearchStrategy, CCPChromosome chromosome, boolean applyToAllNodes) {
 	switch (localSearchStrategy) {
 	case Swap:
 	    try {
-		applySwap(chromosome);
+		applySwap(chromosome, applyToAllNodes);
 	    } catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -41,7 +41,7 @@ public class LocalSearchWrapper {
 	    break;
 	case OneChange:
 	    try {
-		applyOneChange(chromosome);
+		applyOneChange(chromosome, applyToAllNodes);
 	    } catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -53,7 +53,7 @@ public class LocalSearchWrapper {
 	}
     }
     
-    private void applyOneChange(CCPChromosome chromosome) throws Exception {
+    private void applyOneChange(CCPChromosome chromosome, boolean applyToAllNodes) throws Exception {
 	ArrayList<Integer> allNodesIndicesCopy = new ArrayList<>(allNodesIndices);
 	ArrayList<Integer> allClustersIndicesCopy;
 	int node, cluster;
@@ -85,7 +85,7 @@ public class LocalSearchWrapper {
 		allClustersIndicesCopy.remove(new Integer(cluster));
 	    }
 	    
-	    if(chromosomeImprovement) {
+	    if(chromosomeImprovement && !applyToAllNodes) {
 		break;
 	    }
 	    
@@ -134,7 +134,7 @@ public class LocalSearchWrapper {
 	return false;
     }
     
-    private void applySwap(CCPChromosome chromosome) throws Exception {
+    private void applySwap(CCPChromosome chromosome, boolean applyToAllNodes) throws Exception {
 	int node1 = 0, node2 = 0;
 	int indexNode = 0;
 	ArrayList<Integer> allNodesIndicesCopy = new ArrayList<>(allNodesIndices);
@@ -165,7 +165,9 @@ public class LocalSearchWrapper {
 	    if(swapNode != -1) {
 		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
 		allNodesIndicesCopy.remove(new Integer(swapNode));
-		break;
+		if(!applyToAllNodes) {
+		    break;
+		}
 	    }
 	    
 	    allNodesIndicesCopy.remove(new Integer(node1));
