@@ -143,10 +143,9 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     @Override
     public void applyLocalSearch(CCPChromosome chromosome) {
-	int lsIndex = 0;
-	
-	lsIndex = rng.nextInt(2);
-	localSearch.applyLocalSearch(LocalSearchStrategy.values()[lsIndex], chromosome);
+	//lsIndex = rng.nextInt(2);
+	//localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome);
+	localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome);
     }
     
     private void mutateGene(CCPChromosome chromosome, int locus) {
