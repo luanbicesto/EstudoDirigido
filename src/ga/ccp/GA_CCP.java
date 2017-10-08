@@ -54,6 +54,9 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	case NoSelection:
 	    parents = (CCPPopulation)population;
 	    break;
+	case SemiTournament:
+	    parents = selectParentsBySemiTournament((CCPPopulation)population);
+	    break;
 
 	default:
 	    break;
@@ -123,18 +126,11 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
     @Override
     public Population<CCPChromosome> mutate(Population<CCPChromosome> offsprings) {
-	boolean chromosomeChanged;
 	for (CCPChromosome chromosome : offsprings) {
-	    chromosomeChanged = false;
 	    for (int i = 0; i < chromosome.getCodification().length; i++) {
 		if (rng.nextDouble() < mutationRate) {
-		    chromosomeChanged = true;
 		    mutateGene(chromosome, i);
 		}
-	    }
-
-	    if (chromosomeChanged) {
-		//chromosome.setFitness();
 	    }
 	}
 
@@ -143,11 +139,12 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     @Override
     public void applyLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
-	//lsIndex = rng.nextInt(2);
-	
-	localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
-	if(applyToAllNodes) {
+	if(CCPParameters.ENABLE_ONE_CHANGE) {
 	    localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, applyToAllNodes);
+	}
+	
+	if(CCPParameters.ENABLE_SWAP) {
+	    localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
 	}
     }
     
@@ -227,6 +224,35 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		parents.add(parent1);
 	    } else {
 		parents.add(parent2);
+	    }
+	}
+
+	return parents;
+    }
+    
+    private CCPPopulation selectParentsBySemiTournament(CCPPopulation population) {
+	CCPPopulation parents = new CCPPopulation();
+	CCPChromosome betterParent;
+	CCPChromosome worstParent;
+
+	while (parents.size() < popSize) {
+	    int index1 = rng.nextInt(popSize);
+	    CCPChromosome parent1 = population.get(index1);
+	    int index2 = rng.nextInt(popSize);
+	    CCPChromosome parent2 = population.get(index2);
+
+	    if (parent1.getFitness() > parent2.getFitness()) {
+		betterParent = parent1;
+		worstParent = parent2;
+	    } else {
+		betterParent = parent2;
+		worstParent = parent1;
+	    }
+
+	    if (rng.nextDouble() < CCPParameters.PERCENTAGE_SEMI_TOURNAMENT) {
+		parents.add(worstParent);
+	    } else {
+		parents.add(betterParent);
 	    }
 	}
 

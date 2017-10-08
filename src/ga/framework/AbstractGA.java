@@ -41,7 +41,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	Population<C> population = initializePopulation();
 	bestChromosome = getBestChromosome(population);
 	
-	for (int g = 1; g <= generations; g++) {
+	for (int g = 1; g <= generations && getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
 	    applyLocalSearch(population);
 	    Population<C> parents = selectParents(population);
 	    Population<C> offsprings = crossover(parents);
@@ -100,9 +100,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	
 	applyLocalSearch(bestChromosome, true);
 	((CCPChromosome)bestChromosome).verifyFitness();
-	long endTime = System.currentTimeMillis();
-	long totalTime = endTime - startTime;
-	System.out.println("Time = " + (double) totalTime / (double) 1000 + " seg");
+	System.out.println("Time = " + getRunningTime(startTime) + " seg");
 	return bestChromosome;
     }
     
@@ -138,5 +136,12 @@ public abstract class AbstractGA<C extends Chromosome> {
 		applyLocalSearch(chromosome, false);
 	    }
 	}
+    }
+    
+    private double getRunningTime(long startTime) {
+	long endTime = System.currentTimeMillis();
+	long totalTime = endTime - startTime;
+	
+	return (double) totalTime / (double) 1000;
     }
 }
