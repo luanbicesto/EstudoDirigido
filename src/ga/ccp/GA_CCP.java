@@ -13,7 +13,6 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     private CCPInstanceEntity instance;
     private LocalSearchWrapper localSearch;
-    private CCPPopulation bufferNewIndividuals;
     
     public static void main(String[] args) throws Exception {
 	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, CCPParameters.INSTANCE_NAME);
@@ -25,7 +24,6 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	super();
 	this.instance = instance;
 	this.localSearch = new LocalSearchWrapper(instance, rng);
-	this.bufferNewIndividuals = new CCPPopulation();
     }
 
     @Override
@@ -43,16 +41,6 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	//initializeBufferIndividuals();
 
 	return newPopulation;
-    }
-    
-    private void initializeBufferIndividuals() {
-	while (bufferNewIndividuals.size() < popSize * GAConfiguration.TIMES_SIZE_NEW_POPULATION) {
-	    try {
-		bufferNewIndividuals.add(generateRandomChromosome());
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
     }
 
     @Override
@@ -91,7 +79,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	int numberLocusCrossover = 0;
 	
 	CCPChromosome parent1 = parents.get(rng.nextInt(parents.size()));
-	CCPChromosome parent2 = getSecondParent(parents, bufferNewIndividuals);
+	CCPChromosome parent2 = getSecondParent(parents);
 	CCPChromosome offspring1 = parent1.clone();
 	CCPChromosome offspring2 = parent2.clone();
 	
@@ -101,13 +89,11 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	    crossover(parent2, offspring1);
 	}
 
-	//offspring2.setFitness();
-	//offspring1.setFitness();
 	offspring.add(offspring1);
 	offspring.add(offspring2);
     }
     
-    private CCPChromosome getSecondParent(Population<CCPChromosome> parents, CCPPopulation newPopulation) {
+    private CCPChromosome getSecondParent(Population<CCPChromosome> parents) {
 	CCPChromosome parent2 = parents.get(rng.nextInt(parents.size()));
 	
 	if(GAConfiguration.ENABLE_NEW_POPULATION &&
@@ -157,9 +143,10 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     @Override
     public void applyLocalSearch(CCPChromosome chromosome) {
-	//chromosome.verifyFitness();
-	localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome);
-	//chromosome.verifyFitness();
+	int lsIndex = 0;
+	
+	lsIndex = rng.nextInt(2);
+	localSearch.applyLocalSearch(LocalSearchStrategy.values()[lsIndex], chromosome);
     }
     
     private void mutateGene(CCPChromosome chromosome, int locus) {

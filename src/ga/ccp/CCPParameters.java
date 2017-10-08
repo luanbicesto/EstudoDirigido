@@ -18,6 +18,7 @@ public class CCPParameters {
 	Swap,
 	OneChange
     }
+    public static final double PERCENTAGE_SWAP = 0.5;
     /*Local Search*/
     
 }
