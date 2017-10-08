@@ -63,6 +63,9 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	case Tournament:
 	    parents = selectParentsByTournament((CCPPopulation)population);
 	    break;
+	case NoSelection:
+	    parents = (CCPPopulation)population;
+	    break;
 
 	default:
 	    break;
@@ -108,7 +111,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	CCPChromosome parent2 = parents.get(rng.nextInt(parents.size()));
 	
 	if(GAConfiguration.ENABLE_NEW_POPULATION &&
-	   rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION) {
+	   rng.nextDouble() < applyNewPopulationPercentage) {
 	    //parent2 = newPopulation.get(rng.nextInt(newPopulation.size()));
 	    try {
 		parent2 = generateRandomChromosome();
@@ -155,7 +158,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     @Override
     public void applyLocalSearch(CCPChromosome chromosome) {
 	//chromosome.verifyFitness();
-	localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome);
+	localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome);
 	//chromosome.verifyFitness();
     }
     

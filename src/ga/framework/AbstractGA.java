@@ -11,10 +11,15 @@ public abstract class AbstractGA<C extends Chromosome> {
     protected int generations;
     protected int popSize;
     protected double mutationRate;
+    private double currentMutationNumerator = 1;
     protected C bestChromosome;
     protected final Random rng = new Random(0);
     protected final Random rng2 = new Random(1);
     private boolean verbose = true;
+    private int numberGenerationsNoImprovement = 0;
+    private int numberGenerationsPlatoTreatment = 0;
+    private boolean platoAlert = false;
+    protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
     
     public abstract Population<C> initializePopulation();
     public abstract Population<C> selectParents(Population<C> population);
@@ -42,6 +47,21 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    Population<C> offsprings = crossover(parents);
 	    Population<C> mutants = offsprings;
 	    if(GAConfiguration.ENABLE_MUTATION) {
+		/*if(numberGenerationsNoImprovement > GAConfiguration.MAX_NUMBER_GENERATIONS_NO_IMPROVEMENT) {
+		    if (currentMutationNumerator < GAConfiguration.MAX_VALUE_MUTATION_NUMERATOR) {
+			currentMutationNumerator++;
+		    }
+		    mutationRate = 2 / (double) popSize;
+		    platoAlert = true;
+		    numberGenerationsNoImprovement = 0;
+		}
+		
+		if(numberGenerationsPlatoTreatment == GAConfiguration.MAX_NUMBER_GENERATIONS_PlATO_TREATMENT) {
+		    numberGenerationsNoImprovement = -1 * GAConfiguration.MAX_NUMBER_GENERATIONS_PlATO_TREATMENT;
+		    platoAlert = false;
+		    numberGenerationsPlatoTreatment = 0;
+		    mutationRate = 1 / (double) popSize;
+		}*/
 		mutants = mutate(offsprings);
 	    }
 	    Population<C> newpopulation = selectNextPopulation(mutants);
@@ -52,10 +72,29 @@ public abstract class AbstractGA<C extends Chromosome> {
 		applyLocalSearch(offspringBestChromosome);
 	    }
 	    if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
+		/*if(offspringBestChromosome.getFitness() - bestChromosome.getFitness() < GAConfiguration.MINIMUM_IMPROVEMENT) {
+		    numberGenerationsNoImprovement++;
+		    if (platoAlert) {
+			numberGenerationsPlatoTreatment++;
+		    }
+		} else {
+		  if(platoAlert) {
+		      platoAlert = false;
+		      numberGenerationsNoImprovement = 0;
+		      currentMutationNumerator = 1;
+		      mutationRate = currentMutationNumerator / (double)popSize;
+		      numberGenerationsPlatoTreatment = 0;
+		  }
+		}*/
 		bestChromosome = offspringBestChromosome;
 		if (verbose) {
 		    System.out.println("(Gen. " + g + ") BestSol = " + bestChromosome.getFitness());
 		}
+	    } else {
+		/*numberGenerationsNoImprovement++;
+		if(platoAlert) {
+		    numberGenerationsPlatoTreatment++;
+		}*/
 	    }
 	}
 	

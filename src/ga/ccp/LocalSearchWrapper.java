@@ -9,14 +9,20 @@ import ga.ccp.CCPParameters.LocalSearchStrategy;
 public class LocalSearchWrapper {
     
     private ArrayList<Integer> allNodesIndices;
+    private ArrayList<Integer> allClustersIndices;
     private Random rng;
     private CCPInstanceEntity instance;
     
     public LocalSearchWrapper(CCPInstanceEntity instance, Random rng) {
 	allNodesIndices = new ArrayList<>();
+	allClustersIndices = new ArrayList<>();
 	
 	for(int i = 0; i < instance.getN(); i++) {
 	    allNodesIndices.add(i);
+	}
+	
+	for(int k = 0; k < instance.getK(); k++) {
+	    allClustersIndices.add(k);
 	}
 	
 	this.rng = rng;
@@ -33,10 +39,99 @@ public class LocalSearchWrapper {
 		e.printStackTrace();
 	    }
 	    break;
+	case OneChange:
+	    try {
+		applyOneChange(chromosome);
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    break;
 
 	default:
 	    break;
 	}
+    }
+    
+    private void applyOneChange(CCPChromosome chromosome) throws Exception {
+	ArrayList<Integer> allNodesIndicesCopy = new ArrayList<>(allNodesIndices);
+	ArrayList<Integer> allClustersIndicesCopy;
+	int node, cluster;
+	int indexNode = 0, indexCluster = 0;
+	int originalClusterId = 0;
+	double currentNodeContributionCluster = 0.0;
+	double migrateNodeContributionCluster = 0.0;
+	boolean chromosomeImprovement = false;
+	
+	while(allNodesIndicesCopy.size() > 0) {
+	    indexNode = rng.nextInt(allNodesIndicesCopy.size());
+	    node = allNodesIndicesCopy.get(indexNode);
+	    originalClusterId = chromosome.getCodification()[node];
+	    currentNodeContributionCluster = chromosome.computeNodeContributionInCluster(node);
+	    allClustersIndicesCopy = new ArrayList<>(allClustersIndices);
+	    
+	    while(!allClustersIndicesCopy.isEmpty()) {
+		indexCluster = rng.nextInt(allClustersIndicesCopy.size());
+		cluster = allClustersIndicesCopy.get(indexCluster);
+		if(cluster != originalClusterId) {
+		    migrateNodeContributionCluster = computeOneChangeImprovement(node, cluster, chromosome);
+		    double fitnessDifference = migrateNodeContributionCluster - currentNodeContributionCluster;
+		    if(fitnessDifference >= 1) {
+			migrateNode(node, cluster, chromosome, fitnessDifference);
+			chromosomeImprovement = true;
+			break;
+		    }
+		}
+		allClustersIndicesCopy.remove(new Integer(cluster));
+	    }
+	    
+	    if(chromosomeImprovement) {
+		break;
+	    }
+	    
+	    allNodesIndicesCopy.remove(new Integer(node));
+	}
+    }
+    
+    private void migrateNode(int node, int targetCluster, CCPChromosome chromosome, double fitnessDifference) throws Exception {
+	chromosome.setAllele(node, targetCluster, false);
+	chromosome.addToFitness(fitnessDifference);
+    }
+    
+    private double computeOneChangeImprovement(int node, int targetCluster, CCPChromosome chromosome) throws Exception {
+	double improvement = 0.0;
+	int originalCluster = 0;
+	
+	if(canMigrateToCluster(node, targetCluster, chromosome)) {
+	    originalCluster = chromosome.getCodification()[node];
+	    chromosome.getCodification()[node] = targetCluster;
+	    chromosome.getNodesByCluster().get(targetCluster).add(new Integer(node));
+	    improvement = chromosome.computeNodeContributionInCluster(node);
+	    chromosome.getNodesByCluster().get(targetCluster).remove(new Integer(node));
+	    chromosome.getCodification()[node] = originalCluster;
+	}
+	
+	return improvement;
+    }
+    
+    private boolean canMigrateToCluster(int node, int targetCluster, CCPChromosome chromosome) {
+	double targetClusterFutureWeight = 0.0;
+	double originalClusterFutureWeight = 0.0;
+	int originalCluster = 0;
+	
+	try {
+	    originalCluster = chromosome.getCodification()[node];
+	    targetClusterFutureWeight = chromosome.getCurrentClustersWeight().get(targetCluster) + instance.getNodeWeights()[node];
+	    originalClusterFutureWeight = chromosome.getCurrentClustersWeight().get(originalCluster) - instance.getNodeWeights()[node];
+	    
+	    return Common.isClusterWithinWeights(targetCluster, targetClusterFutureWeight, instance) &&
+		   Common.isClusterWithinWeights(originalCluster, originalClusterFutureWeight, instance);
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	
+	return false;
     }
     
     private void applySwap(CCPChromosome chromosome) throws Exception {

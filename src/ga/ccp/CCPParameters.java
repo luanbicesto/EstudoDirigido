@@ -3,7 +3,8 @@ package ga.ccp;
 public class CCPParameters {
     /*CROSSOVER*/
     public enum SelectParentsTypeEnum {
-	Tournament
+	Tournament,
+	NoSelection
     }
     public static final SelectParentsTypeEnum selectParentsType = SelectParentsTypeEnum.Tournament;
     

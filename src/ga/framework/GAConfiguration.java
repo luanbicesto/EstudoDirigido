@@ -17,4 +17,9 @@ public class GAConfiguration {
     public static final double TIMES_SIZE_NEW_POPULATION = 2; //not used
     public static double PERCENTAGE_APPLY_NEW_POPULATION = 0.1;
     /*New population*/
+    
+    public static int MAX_NUMBER_GENERATIONS_NO_IMPROVEMENT = 10000;
+    public static int MAX_NUMBER_GENERATIONS_PlATO_TREATMENT = 5000;
+    public static int MAX_VALUE_MUTATION_NUMERATOR = 4;
+    public static double MINIMUM_IMPROVEMENT = 1.0;
 }

@@ -67,7 +67,11 @@ public class CCPChromosome extends Chromosome {
 	this.codification[locus] = -1;
     }
     
-    public void setAllele(int locus, Integer targetClusterId) throws Exception {
+    public boolean setAllele(int locus, Integer targetClusterId) throws Exception {
+	return setAllele(locus, targetClusterId, true);
+    }
+    
+    public boolean setAllele(int locus, Integer targetClusterId, boolean shouldSetFitness) throws Exception {
 	int originalClusterId = 0;
 	double targetClusterWeight = 0.0;
 	double originalClusterFutureWeight = 0.0;
@@ -82,17 +86,26 @@ public class CCPChromosome extends Chromosome {
 	    double currentContribution = 0.0;
 
 	    // Update fitness and adjust nodes by cluster
-	    previousContribution = computeNodeContributionInCluster(locus);
+	    if(shouldSetFitness) {
+		previousContribution = computeNodeContributionInCluster(locus);
+	    }
+	    
 	    this.getCodification()[locus] = targetClusterId;
 	    this.nodesByCluster.get(originalClusterId).remove(new Integer(locus));
 	    this.nodesByCluster.get(targetClusterId).add(new Integer(locus));
-	    currentContribution = computeNodeContributionInCluster(locus);
-	    this.fitness = this.fitness - previousContribution + currentContribution;
+	    
+	    if(shouldSetFitness) {
+		currentContribution = computeNodeContributionInCluster(locus);
+		this.fitness = this.fitness - previousContribution + currentContribution;
+	    }
 
 	    // Update weights of the clusters
 	    this.clustersCurrentWeight.set(originalClusterId, originalClusterFutureWeight);
 	    this.clustersCurrentWeight.set(targetClusterId, targetClusterWeight);
+	    return true;
 	}
+	
+	return false;
     }
     
     public boolean canSetAllele(int locus, Integer targetClusterId) throws Exception {
