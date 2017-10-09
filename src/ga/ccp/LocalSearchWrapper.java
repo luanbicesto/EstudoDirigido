@@ -61,7 +61,7 @@ public class LocalSearchWrapper {
 	int originalClusterId = 0;
 	double currentNodeContributionCluster = 0.0;
 	double migrateNodeContributionCluster = 0.0;
-	int nodesToImprove = getNodesToImprove();
+	int nodesToImprove = getNodesToImprove(LocalSearchStrategy.OneChange);
 	int nodesImproved = 0;
 	
 	while(allNodesIndicesCopy.size() > 0) {
@@ -94,8 +94,20 @@ public class LocalSearchWrapper {
 	}
     }
     
-    private int getNodesToImprove() {
-	return (int)Math.round((instance.getN() * CCPParameters.MAX_PERCENTAGE_NUMBER_NODES_LS));
+    private int getNodesToImprove(LocalSearchStrategy strategy) {
+	double percentageNodes = 0.0;
+	switch (strategy) {
+	case OneChange:
+	    percentageNodes = CCPParameters.MAX_PERCENTAGE_NUMBER_NODES_LS_ONE_CHANGE;
+	    break;
+	case Swap:
+	    percentageNodes = CCPParameters.MAX_PERCENTAGE_NUMBER_NODES_LS_SWAP;
+	    break;
+
+	default:
+	    break;
+	}
+	return (int)Math.round((instance.getN() * percentageNodes));
     }
     
     private void migrateNode(int node, int targetCluster, CCPChromosome chromosome, double fitnessDifference) throws Exception {
@@ -146,7 +158,7 @@ public class LocalSearchWrapper {
 	double swapImprovement = 0.0;
 	double bestSwapImprovement = 0.0;
 	int swapNode = -1;
-	int nodesToImprove = getNodesToImprove();
+	int nodesToImprove = getNodesToImprove(LocalSearchStrategy.Swap);
 	int nodesImproved = 0;
 	
 	while(allNodesIndicesCopy.size() > 0) {
