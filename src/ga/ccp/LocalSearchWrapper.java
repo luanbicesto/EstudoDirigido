@@ -61,7 +61,8 @@ public class LocalSearchWrapper {
 	int originalClusterId = 0;
 	double currentNodeContributionCluster = 0.0;
 	double migrateNodeContributionCluster = 0.0;
-	boolean chromosomeImprovement = false;
+	int nodesToImprove = getNodesToImprove();
+	int nodesImproved = 0;
 	
 	while(allNodesIndicesCopy.size() > 0) {
 	    indexNode = rng.nextInt(allNodesIndicesCopy.size());
@@ -78,19 +79,23 @@ public class LocalSearchWrapper {
 		    double fitnessDifference = migrateNodeContributionCluster - currentNodeContributionCluster;
 		    if(fitnessDifference >= 1) {
 			migrateNode(node, cluster, chromosome, fitnessDifference);
-			chromosomeImprovement = true;
+			nodesImproved++;
 			break;
 		    }
 		}
 		allClustersIndicesCopy.remove(new Integer(cluster));
 	    }
 	    
-	    if(chromosomeImprovement && !applyToAllNodes) {
+	    if(nodesImproved == nodesToImprove && !applyToAllNodes) {
 		break;
 	    }
 	    
 	    allNodesIndicesCopy.remove(new Integer(node));
 	}
+    }
+    
+    private int getNodesToImprove() {
+	return (int)Math.round((instance.getN() * CCPParameters.MAX_PERCENTAGE_NUMBER_NODES_LS));
     }
     
     private void migrateNode(int node, int targetCluster, CCPChromosome chromosome, double fitnessDifference) throws Exception {
@@ -141,6 +146,8 @@ public class LocalSearchWrapper {
 	double swapImprovement = 0.0;
 	double bestSwapImprovement = 0.0;
 	int swapNode = -1;
+	int nodesToImprove = getNodesToImprove();
+	int nodesImproved = 0;
 	
 	while(allNodesIndicesCopy.size() > 0) {
 	    indexNode = rng.nextInt(allNodesIndicesCopy.size());
@@ -157,6 +164,7 @@ public class LocalSearchWrapper {
 		    if(swapImprovement > 0) {
 			swapNode = node2;
 			bestSwapImprovement = swapImprovement;
+			nodesImproved++;
 			break;
 		    }
 		}
@@ -165,7 +173,7 @@ public class LocalSearchWrapper {
 	    if(swapNode != -1) {
 		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
 		allNodesIndicesCopy.remove(new Integer(swapNode));
-		if(!applyToAllNodes) {
+		if(nodesImproved == nodesToImprove && !applyToAllNodes) {
 		    break;
 		}
 	    }
