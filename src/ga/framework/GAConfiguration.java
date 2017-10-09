@@ -1,7 +1,7 @@
 package ga.framework;
 
 public class GAConfiguration {
-    public static final long TOTAL_RUNNING_TIME = 60;
+    public static final long TOTAL_RUNNING_TIME = 600;
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
     public static final double MUTATION_RATE = 1 / (double)POPULATION_SIZE;
@@ -10,7 +10,7 @@ public class GAConfiguration {
     public static boolean ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS = false;
     public static int PERCENTAGE_HYBRID_POPULATION = 10; //not used
     public static int ABSOLUTE_HYBRID_POPULATION = 10;
-    public static double PERCENTAGE_APPLY_HYBRID_TRANSFORMATION = 1;
+    public static double PERCENTAGE_APPLY_HYBRID_TRANSFORMATION = 0.7;
     
     /*New population*/
     public static final boolean ENABLE_NEW_POPULATION = true;
