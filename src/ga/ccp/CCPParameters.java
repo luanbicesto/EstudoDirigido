@@ -12,7 +12,7 @@ public class CCPParameters {
     public static final double MAX_PERCENTAGE_LOCUS_CROSSOVER = 0.4;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "RanReal240_01.txt";
+    public static final String INSTANCE_NAME = "RanReal240_02.txt";
     
     /*Local Search*/
     public enum LocalSearchStrategy {
