@@ -1,6 +1,8 @@
 package ga.ccp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
@@ -87,9 +89,14 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	CCPChromosome offspring2 = parent2.clone();
 	
 	numberLocusCrossover = rng.nextInt((int)Math.round(maxNumberLocusCrossover)) + 1;	
-	for(int i = 0; i < numberLocusCrossover; i++) {
-	    crossover(parent1, offspring2);
-	    crossover(parent2, offspring1);
+	if (CCPParameters.ORDERED_CROSSOVER_ENABLED) {
+	    orderedCrossover(numberLocusCrossover, parent1, offspring2);
+	    orderedCrossover(numberLocusCrossover, parent2, offspring1);
+	} else {
+	    for (int i = 0; i < numberLocusCrossover; i++) {
+		crossover(parent1, offspring2);
+		crossover(parent2, offspring1);
+	    }
 	}
 
 	offspring.add(offspring1);
@@ -113,8 +120,38 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	return parent2;
     }
     
+    private void orderedCrossover(int numberLocusCrossover, CCPChromosome parent, CCPChromosome offspring) {
+	ArrayList<Integer> nodesCrossover = new ArrayList<>();
+	
+	for(int i = 0; i < numberLocusCrossover; i++) {
+	    nodesCrossover.add(rng.nextInt(instance.getN()));
+	}
+	
+	Collections.sort(nodesCrossover, new Comparator<Integer>() {
+	    @Override
+	    public int compare(Integer o1, Integer o2) {
+		try {
+		    return Double.compare(instance.getNodeWeights()[o1], instance.getNodeWeights()[o2]);
+		} catch (Exception e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
+		return 0;
+	    }
+	});
+	Collections.reverse(nodesCrossover);
+	
+	for(int i = 0; i < nodesCrossover.size(); i++) {
+	    crossover(parent, offspring, nodesCrossover.get(i));
+	}
+    }
+    
     private void crossover(CCPChromosome parent, CCPChromosome offspring) {
 	int locusIndex = rng.nextInt(parent.getCodification().length);
+	crossover(parent, offspring, locusIndex);
+    }
+    
+    private void crossover(CCPChromosome parent, CCPChromosome offspring, int locusIndex) {
 	int parentClusterId = parent.getCodification()[locusIndex];
 	try {
 	    offspring.setAllele(locusIndex, parentClusterId);
