@@ -2,6 +2,8 @@ package ga.framework;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import ga.ccp.CCPChromosome;
@@ -20,30 +22,35 @@ public abstract class AbstractGA<C extends Chromosome> {
     private int numberGenerationsPlatoTreatment = 0;
     private boolean platoAlert = false;
     protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
+    protected LinkedList<Population<C>> generationsQueue;
+    protected int numberGenerations;
     
     public abstract Population<C> initializePopulation();
-    public abstract Population<C> selectParents(Population<C> population);
+    public abstract Population<C> selectParents(LinkedList<Population<C>> generationsQueue);
     public abstract Population<C> crossover(Population<C> parents);
     public abstract Population<C> mutate(Population<C> offsprings);
-    public abstract Population<C> selectNextPopulation(Population<C> offsprings);
+    public abstract Population<C> selectNextPopulation(Population<C> offsprings, LinkedList<Population<C>> generationsQueue);
     public abstract void applyLocalSearch(C chromosome, boolean applyToAllNodes);
     
     public AbstractGA() {
 	this.generations = GAConfiguration.NUMBER_GENERATIONS;
 	this.popSize = GAConfiguration.POPULATION_SIZE;
 	this.mutationRate = GAConfiguration.MUTATION_RATE;
+	this.generationsQueue = new LinkedList<Population<C>>();
+	this.numberGenerations = 10;
     }
     
     public Chromosome solve() {
 	long startTime = System.currentTimeMillis();
 	C offspringBestChromosome;
 	/* starts the initial population */
-	Population<C> population = initializePopulation();
-	bestChromosome = getBestChromosome(population);
+	initializeGenerations();
+	Population<C> population = generationsQueue.getLast();
+	bestChromosome = getBestChromosomeGenerations(generationsQueue);
 	
 	for (int g = 1; g <= generations && getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
 	    applyLocalSearch(population);
-	    Population<C> parents = selectParents(population);
+	    Population<C> parents = selectParents(generationsQueue);
 	    Population<C> offsprings = crossover(parents);
 	    Population<C> mutants = offsprings;
 	    if(GAConfiguration.ENABLE_MUTATION) {
@@ -64,7 +71,8 @@ public abstract class AbstractGA<C extends Chromosome> {
 		}*/
 		mutants = mutate(offsprings);
 	    }
-	    Population<C> newpopulation = selectNextPopulation(mutants);
+	    //applyLocalSearch(mutants);
+	    Population<C> newpopulation = selectNextPopulation(mutants, generationsQueue);
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);
 	    
@@ -101,6 +109,27 @@ public abstract class AbstractGA<C extends Chromosome> {
 	applyLocalSearch(bestChromosome, true);
 	((CCPChromosome)bestChromosome).verifyFitness();
 	System.out.println("Time = " + getRunningTime(startTime) + " seg");
+	return bestChromosome;
+    }
+    
+    private void initializeGenerations() {
+	for(int i = 0; i < numberGenerations; i++) {
+	    generationsQueue.add(initializePopulation());
+	}
+    }
+    
+    private C getBestChromosomeGenerations(LinkedList<Population<C>> generationsQueue) {
+	C bestChromosome = null;
+	double bestChromosomeFitness = 0.0;
+	
+	for(int i = 0; i < generationsQueue.size(); i++) {
+	    C generationBestChromosome = getBestChromosome(generationsQueue.get(i));
+	    if(generationBestChromosome.getFitness() > bestChromosomeFitness) {
+		bestChromosome = generationBestChromosome;
+		bestChromosomeFitness = bestChromosome.getFitness(); 
+	    }
+	}
+	
 	return bestChromosome;
     }
     

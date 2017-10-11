@@ -3,6 +3,8 @@ package ga.ccp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Random;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
@@ -46,25 +48,33 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     }
 
     @Override
-    public CCPPopulation selectParents(Population<CCPChromosome> population) {
-	CCPPopulation parents = null;
+    public CCPPopulation selectParents(LinkedList<Population<CCPChromosome>> generationsQueue) {
+	CCPPopulation parents = new CCPPopulation();
 	
-	switch (CCPParameters.selectParentsType) {
-	case Tournament:
-	    parents = selectParentsByTournament((CCPPopulation)population);
-	    break;
-	case NoSelection:
-	    parents = (CCPPopulation)population;
-	    break;
-	case SemiTournament:
-	    parents = selectParentsBySemiTournament((CCPPopulation)population);
-	    break;
-
-	default:
-	    break;
+	while (parents.size() < popSize) {
+	    CCPChromosome parent1 = chooseParent(generationsQueue, 0);
+	    CCPChromosome parent2 = chooseParent(generationsQueue, 1);
+	    if (parent1.getFitness() > parent2.getFitness()) {
+		parents.add(parent1);
+	    } else {
+		parents.add(parent2);
+	    }
 	}
 	
 	return parents;
+    }
+    
+    private CCPChromosome chooseParent(LinkedList<Population<CCPChromosome>> generationsQueue, int parentId) {
+	Random localRng = parentId == 0 ? rng : rng2;
+	CCPPopulation generation = null;
+	int generationIndex = 0;
+	int indexChromosome = 0;
+	
+	generationIndex = localRng.nextInt(numberGenerations);
+	generation = (CCPPopulation)generationsQueue.get(generationIndex);
+	indexChromosome = localRng.nextInt(generation.size());
+	
+	return generation.get(indexChromosome);
     }
 
     @Override
@@ -198,13 +208,16 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     }
 
     @Override
-    public Population<CCPChromosome> selectNextPopulation(Population<CCPChromosome> offsprings) {
+    public Population<CCPChromosome> selectNextPopulation(Population<CCPChromosome> offsprings, LinkedList<Population<CCPChromosome>> generationsQueue) {
 	CCPChromosome worst = (CCPChromosome) getWorstChromosome(offsprings);
 
 	if (worst.getFitness() < bestChromosome.getFitness()) {
 	    offsprings.remove(worst);
 	    offsprings.add((CCPChromosome) bestChromosome);
 	}
+	
+	generationsQueue.removeFirst(); //removes the oldest population
+	generationsQueue.add(offsprings); //adds the new generation
 
 	return offsprings;
     }

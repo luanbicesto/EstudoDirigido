@@ -9,11 +9,11 @@ public class CCPParameters {
     }
     public static final SelectParentsTypeEnum selectParentsType = SelectParentsTypeEnum.Tournament;
     public static final double PERCENTAGE_SEMI_TOURNAMENT = 0.1;
-    public static final double MAX_PERCENTAGE_LOCUS_CROSSOVER = 0.5;
+    public static final double MAX_PERCENTAGE_LOCUS_CROSSOVER = 0.4;
     public static final boolean ORDERED_CROSSOVER_ENABLED = false;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "RanReal240_01.txt";
+    public static final String INSTANCE_NAME = "RanReal240_02.txt";
     
     /*Local Search*/
     public enum LocalSearchStrategy {
