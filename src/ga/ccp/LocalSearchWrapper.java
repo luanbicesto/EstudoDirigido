@@ -61,8 +61,11 @@ public class LocalSearchWrapper {
 	int originalClusterId = 0;
 	double currentNodeContributionCluster = 0.0;
 	double migrateNodeContributionCluster = 0.0;
+	double bestContribution = 0.0;
 	int nodesToImprove = getNodesToImprove(LocalSearchStrategy.OneChange);
 	int nodesImproved = 0;
+	int targetCluster = -1;
+	boolean nodeImproved = false;
 	
 	while(allNodesIndicesCopy.size() > 0) {
 	    indexNode = rng.nextInt(allNodesIndicesCopy.size());
@@ -70,6 +73,9 @@ public class LocalSearchWrapper {
 	    originalClusterId = chromosome.getCodification()[node];
 	    currentNodeContributionCluster = chromosome.computeNodeContributionInCluster(node);
 	    allClustersIndicesCopy = new ArrayList<>(allClustersIndices);
+	    bestContribution = 0.0;
+	    nodeImproved = false;
+	    targetCluster = -1;
 	    
 	    while(!allClustersIndicesCopy.isEmpty()) {
 		indexCluster = rng.nextInt(allClustersIndicesCopy.size());
@@ -77,13 +83,21 @@ public class LocalSearchWrapper {
 		if(cluster != originalClusterId) {
 		    migrateNodeContributionCluster = computeOneChangeImprovement(node, cluster, chromosome);
 		    double fitnessDifference = migrateNodeContributionCluster - currentNodeContributionCluster;
-		    if(fitnessDifference >= 1) {
-			migrateNode(node, cluster, chromosome, fitnessDifference);
-			nodesImproved++;
-			break;
+		    if(fitnessDifference > bestContribution) {
+			bestContribution = fitnessDifference;
+			targetCluster = cluster;
+			nodeImproved = true;
+			if(!CCPParameters.BEST_IMPROVING) {
+			    break;
+			}
 		    }
 		}
 		allClustersIndicesCopy.remove(new Integer(cluster));
+	    }
+	    
+	    if(nodeImproved) {
+		migrateNode(node, targetCluster, chromosome, bestContribution);
+		nodesImproved++;
 	    }
 	    
 	    if(nodesImproved == nodesToImprove && !applyToAllNodes) {
@@ -173,11 +187,12 @@ public class LocalSearchWrapper {
 		node2 = allNodesIndicesCopy.get(indexNode);
 		if(node1 != node2) {
 		    swapImprovement = computeSwapImprovement(node1, node2, chromosome);
-		    if(swapImprovement > 0) {
+		    if(swapImprovement > bestSwapImprovement) {
 			swapNode = node2;
 			bestSwapImprovement = swapImprovement;
-			nodesImproved++;
-			break;
+			if(!CCPParameters.BEST_IMPROVING) {
+			    break;
+			}
 		    }
 		}
 	    }
@@ -185,6 +200,7 @@ public class LocalSearchWrapper {
 	    if(swapNode != -1) {
 		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
 		allNodesIndicesCopy.remove(new Integer(swapNode));
+		nodesImproved++;
 		if(nodesImproved == nodesToImprove && !applyToAllNodes) {
 		    break;
 		}
