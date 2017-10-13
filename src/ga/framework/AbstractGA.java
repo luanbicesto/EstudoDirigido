@@ -42,7 +42,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	bestChromosome = getBestChromosome(population);
 	
 	for (int g = 1; g <= generations && getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
-	    applyLocalSearch(population);
+	    //applyLocalSearch(population);
 	    Population<C> parents = selectParents(population);
 	    Population<C> offsprings = crossover(parents);
 	    Population<C> mutants = offsprings;
@@ -64,6 +64,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 		}*/
 		mutants = mutate(offsprings);
 	    }
+	    applyLocalSearch(mutants);
 	    Population<C> newpopulation = selectNextPopulation(mutants);
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);
