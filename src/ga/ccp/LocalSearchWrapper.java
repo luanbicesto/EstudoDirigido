@@ -100,7 +100,7 @@ public class LocalSearchWrapper {
 		nodesImproved++;
 	    }
 	    
-	    if(nodesImproved == nodesToImprove && !applyToAllNodes) {
+	    if((nodesImproved == nodesToImprove && !applyToAllNodes) || CCPParameters.ONE_NODE_OPTION) {
 		break;
 	    }
 	    
@@ -201,7 +201,7 @@ public class LocalSearchWrapper {
 		swapNodes(node1, swapNode, bestSwapImprovement, chromosome);
 		allNodesIndicesCopy.remove(new Integer(swapNode));
 		nodesImproved++;
-		if(nodesImproved == nodesToImprove && !applyToAllNodes) {
+		if((nodesImproved == nodesToImprove && !applyToAllNodes) || CCPParameters.ONE_NODE_OPTION) {
 		    break;
 		}
 	    }

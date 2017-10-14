@@ -13,7 +13,7 @@ public class CCPParameters {
     public static final boolean ORDERED_CROSSOVER_ENABLED = false;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "RanReal240_20.txt";
+    public static final String INSTANCE_NAME = "RanReal240_01.txt";
     
     /*Local Search*/
     public enum LocalSearchStrategy {
@@ -25,6 +25,7 @@ public class CCPParameters {
     public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_SWAP = 0.6;
     public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_ONE_CHANGE = 0.6;
     public static final boolean BEST_IMPROVING = true;
+    public static final boolean ONE_NODE_OPTION = false;
     /*Local Search*/
     
 }
