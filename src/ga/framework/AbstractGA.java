@@ -14,7 +14,6 @@ public abstract class AbstractGA<C extends Chromosome> {
     private double currentMutationNumerator = 1;
     protected C bestChromosome;
     protected final Random rng = new Random(0);
-    protected final Random rng2 = new Random(1);
     private boolean verbose = true;
     private int numberGenerationsNoImprovement = 0;
     private int numberGenerationsPlatoTreatment = 0;
@@ -129,7 +128,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	int numberHybridCromossomes = 0;
 	
 	if (GAConfiguration.ENABLE_HYBRID_POPULATION && 
-	    rng2.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
+	    rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
 	    numberHybridCromossomes = GAConfiguration.ABSOLUTE_HYBRID_POPULATION;
 	    for (int i = 0; i < numberHybridCromossomes; i++) {
 		chromosomeIndex = rng.nextInt(population.size());
