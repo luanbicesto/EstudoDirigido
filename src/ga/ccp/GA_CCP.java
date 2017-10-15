@@ -191,8 +191,8 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 	newCluster = rng.nextInt(instance.getK());
 	try {
-	    if(!chromosome.setAllele(locus, newCluster)) {
-		//mutateGeneSwap(chromosome, locus, newCluster);
+	    if(!chromosome.setAllele(locus, newCluster) && GAConfiguration.ENABLE_MUTATION_SWAP) {
+		mutateGeneSwap(chromosome, locus, newCluster);
 	    }
 	} catch (Exception e) {
 	    // TODO Auto-generated catch block
@@ -203,12 +203,14 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     private void mutateGeneSwap(CCPChromosome chromosome, int locus, int targetCluster) {
 	ArrayList<Integer> allNodesTargetCluster = null;
 	double swapImprovement = 0.0;
+	int nodeIndex = 0;
 	
 	allNodesTargetCluster = new ArrayList<Integer>(chromosome.getNodesByCluster().get(targetCluster));
 	Iterator<Integer> iterator = allNodesTargetCluster.iterator();
 	
 	while(iterator.hasNext()) {
-	    Integer node = iterator.next();
+	    nodeIndex = rng.nextInt(allNodesTargetCluster.size());
+	    Integer node = allNodesTargetCluster.get(nodeIndex);
 	    
 	    swapImprovement = localSearch.computeSwapImprovement(locus, node, chromosome);
 	    if(swapImprovement >= 1.0) {
@@ -219,6 +221,8 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		    e.printStackTrace();
 		}
 		break;
+	    } else {
+		allNodesTargetCluster.remove(node);
 	    }
 	}
 	
