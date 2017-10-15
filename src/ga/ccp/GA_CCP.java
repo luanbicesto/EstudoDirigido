@@ -184,6 +184,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	if(CCPParameters.ENABLE_SWAP) {
 	    localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
 	}
+	
     }
     
     private void mutateGene(CCPChromosome chromosome, int locus) {
