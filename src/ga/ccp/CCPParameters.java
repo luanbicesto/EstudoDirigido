@@ -13,7 +13,7 @@ public class CCPParameters {
     public static final boolean ORDERED_CROSSOVER_ENABLED = false;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "RanReal240_02.txt";
+    public static final String INSTANCE_NAME = "RanReal240_15.txt";
     
     /*Local Search*/
     public enum LocalSearchStrategy {

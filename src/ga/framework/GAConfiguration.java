@@ -4,7 +4,7 @@ public class GAConfiguration {
     public static final long TOTAL_RUNNING_TIME = 60;
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
-    public static final double MUTATION_RATE = 1.1 / (double)POPULATION_SIZE;
+    public static final double MUTATION_RATE = 1.2 / (double)POPULATION_SIZE;
     public static boolean ENABLE_MUTATION_SWAP = false;
     
     public static boolean ENABLE_HYBRID_POPULATION = true;
@@ -17,7 +17,7 @@ public class GAConfiguration {
     public static final boolean ENABLE_NEW_POPULATION = true;
     public static final boolean ENABLE_MUTATION = true;
     public static final double TIMES_SIZE_NEW_POPULATION = 2; //not used
-    public static double PERCENTAGE_APPLY_NEW_POPULATION = 0.2;
+    public static double PERCENTAGE_APPLY_NEW_POPULATION = 0.1;
     /*New population*/
     
     /*Not used*/
