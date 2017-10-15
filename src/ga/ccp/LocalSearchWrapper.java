@@ -1,6 +1,7 @@
 package ga.ccp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import common.instance.reader.CCPInstanceEntity;
@@ -47,10 +48,173 @@ public class LocalSearchWrapper {
 		e.printStackTrace();
 	    }
 	    break;
+	case TripleSwap:
+	    applyNSwap(chromosome, 3);
+	    break;
 
 	default:
 	    break;
 	}
+    }
+    
+    private void applyNSwap(CCPChromosome chromosome, int n) {
+	ArrayList<Integer> clusters = new ArrayList<>(n);
+	ArrayList<Integer> nodes = new ArrayList<>(n);
+	ArrayList<Integer> nodesOfCluster = null;
+	ArrayList<Integer> clustersIds = new ArrayList<>(this.allClustersIndices);
+	int nodeIndex = -1;
+	int selectedNode = 0;
+	double currentContribution = 0.0;
+	
+	//select clusters
+	for(int i = 0; i < n; i++) {
+	    int cluster = clustersIds.get(rng.nextInt(clustersIds.size()));
+	    clusters.add(cluster);
+	    clustersIds.remove(new Integer(cluster));
+	}
+	
+	//sort clusters
+	//Collections.sort(clusters);
+	
+	//select one node from each cluster
+	for(int i = 0; i < clusters.size(); i++) {
+	    nodesOfCluster = chromosome.getNodesByCluster().get(clusters.get(i));
+	    if(nodesOfCluster.size() == 0) {
+		return;
+	    }
+	    nodeIndex = rng.nextInt(nodesOfCluster.size());
+	    selectedNode = nodesOfCluster.get(nodeIndex);
+	    nodes.add(selectedNode);
+	}
+	
+	//compute current contribution
+	for(int i = 0; i < nodes.size(); i++) {
+	    try {
+		currentContribution += chromosome.computeNodeContributionInCluster(nodes.get(i));
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+	
+	//Identify the best N swap move
+	double bestConfigurationContribution = 0.0;
+	double configurationContribution = 0.0;
+	int bestSteps = 0;
+	int bestType = -1;
+	removeNodesFromCluster(chromosome, nodes);
+	for(int steps = 1; steps <= n-1; steps++) {
+	    for(int type = 0; type < 2; type++) {
+		if(validNSwapStep(steps, type, chromosome, nodes, clusters)) {
+		    try {
+			configurationContribution = computeNSwapContribution(steps, type, chromosome, nodes, clusters);
+			if(configurationContribution > bestConfigurationContribution) {
+			    bestConfigurationContribution = configurationContribution;
+			    bestSteps = steps;
+			    bestType = type;
+			}
+		    } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
+		}
+	    }
+	}
+	
+	//Apply swap
+	applyNSwapMove(chromosome, nodes, bestSteps, bestType,
+		    bestConfigurationContribution, currentContribution, clusters);
+	
+    }
+    
+    private void applyNSwapMove(CCPChromosome chromosome, ArrayList<Integer> nodes, int bestSteps, int bestType,
+	    double bestConfigurationContribution, double currentContribution, ArrayList<Integer> clusters) {
+	double swapContribution = 0.0;
+	int futureClusterIndex = -1;
+	int futureCluster = 0;
+
+	swapContribution = bestConfigurationContribution - currentContribution;
+	for (int i = 0; i < nodes.size(); i++) {
+	    if (swapContribution > 0) {
+		futureClusterIndex = computeFutureClusterIndexOfNodeNSwap(bestSteps, bestType, i, clusters);
+		futureCluster = clusters.get(futureClusterIndex);
+	    } else {
+		futureCluster = clusters.get(i); // if the move is not valid
+						 // then return the node to its
+						 // original cluster
+	    }
+
+	    try {
+		chromosome.moveNodeCluster(nodes.get(i), futureCluster);
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+    }
+    
+    private double computeNSwapContribution(int steps, int type, CCPChromosome chromosome, ArrayList<Integer> nodes, ArrayList<Integer> clusters) throws Exception {
+	double nSwapContribution = 0.0;
+	int futureClusterIndex = -1;
+	int futureCluster = 0;
+	
+	for (int i = 0; i < nodes.size(); i++) {
+	    futureClusterIndex = computeFutureClusterIndexOfNodeNSwap(steps, type, i, clusters);
+	    futureCluster = clusters.get(futureClusterIndex);
+	    nSwapContribution += computeNodeContributionInCluster(nodes.get(i), futureCluster, chromosome);
+	}
+	
+	return nSwapContribution;
+    }
+    
+    private void removeNodesFromCluster(CCPChromosome chromosome, ArrayList<Integer> nodes) {
+	// remove nodes from original clusters
+	for (int i = 0; i < nodes.size(); i++) {
+	    try {
+		chromosome.removeNodeFromCluster(nodes.get(i), true);
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+    }
+    
+    private boolean validNSwapStep(int steps, int type, CCPChromosome chromosome, ArrayList<Integer> nodes, ArrayList<Integer> clusters) {
+	int futureClusterIndex = -1;
+	int futureCluster = 0;
+	boolean validSwapMovent = true;
+	
+	try {
+	    //verifies with the configuration is valid
+	    for (int i = 0; i < nodes.size(); i++) {
+		futureClusterIndex = computeFutureClusterIndexOfNodeNSwap(steps, type, i, clusters);
+		futureCluster = clusters.get(futureClusterIndex);
+		if(!canMigrateToCluster(nodes.get(i), futureCluster, chromosome, false)) {
+		    validSwapMovent = false;
+		    break;
+		}
+	    }
+
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	
+	return validSwapMovent;
+    }
+    
+    private int computeFutureClusterIndexOfNodeNSwap(int steps, int type, int nodeIndex, ArrayList<Integer> clusters) {
+	int futureClusterIndex = -1;
+	
+	if(type == 0) { //right direction
+	    futureClusterIndex = (nodeIndex + steps) % clusters.size();
+	} else { //left direction
+	    futureClusterIndex = nodeIndex - steps;
+	    if(futureClusterIndex < 0) {
+		futureClusterIndex += clusters.size();
+	    }
+	}
+	
+	return futureClusterIndex;
     }
     
     private void applyOneChange(CCPChromosome chromosome, boolean applyToAllNodes) throws Exception {
@@ -145,15 +309,39 @@ public class LocalSearchWrapper {
 	return improvement;
     }
     
+    private double computeNodeContributionInCluster(int node, int cluster, CCPChromosome chromosome) throws Exception {
+	double improvement = 0.0;
+	int originalCluster = 0;
+
+	originalCluster = chromosome.getCodification()[node];
+	chromosome.getCodification()[node] = cluster;
+	chromosome.getNodesByCluster().get(cluster).add(new Integer(node));
+	improvement = chromosome.computeNodeContributionInCluster(node);
+	chromosome.getNodesByCluster().get(cluster).remove(new Integer(node));
+	chromosome.getCodification()[node] = originalCluster;
+
+	return improvement;
+    }
+    
     private boolean canMigrateToCluster(int node, int targetCluster, CCPChromosome chromosome) {
+	return canMigrateToCluster(node, targetCluster, chromosome, true);
+    }
+    
+    private boolean canMigrateToCluster(int node, int targetCluster, CCPChromosome chromosome, boolean nodeInCluster) {
 	double targetClusterFutureWeight = 0.0;
 	double originalClusterFutureWeight = 0.0;
 	int originalCluster = 0;
+	double nodeWeight = 0.0;
 	
 	try {
-	    originalCluster = chromosome.getCodification()[node];
+	    if(nodeInCluster) {
+		originalCluster = chromosome.getCodification()[node];
+	    }
+	    
 	    targetClusterFutureWeight = chromosome.getCurrentClustersWeight().get(targetCluster) + instance.getNodeWeights()[node];
-	    originalClusterFutureWeight = chromosome.getCurrentClustersWeight().get(originalCluster) - instance.getNodeWeights()[node];
+	    
+	    nodeWeight = nodeInCluster ? instance.getNodeWeights()[node] : 0;
+	    originalClusterFutureWeight = chromosome.getCurrentClustersWeight().get(originalCluster) - nodeWeight;
 	    
 	    return Common.isClusterWithinWeights(targetCluster, targetClusterFutureWeight, instance) &&
 		   Common.isClusterWithinWeights(originalCluster, originalClusterFutureWeight, instance);

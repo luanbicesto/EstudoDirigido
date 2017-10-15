@@ -53,17 +53,24 @@ public class CCPChromosome extends Chromosome {
 	return clone;
     }
     
-    public void removeNodeFromCluster(int locus) throws Exception {
+    public void removeNodeFromCluster(int locus, boolean updateFitness) throws Exception {
 	double nodeContribution = 0.0;
 	double currentClusterWeight = 0.0;
 	int clusterId = 0;
-	
-	nodeContribution = computeNodeContributionInCluster(locus);
-	currentClusterWeight = this.clustersCurrentWeight.get(clusterId);
+
 	clusterId = this.codification[locus];
+	if(updateFitness) {
+	    nodeContribution = computeNodeContributionInCluster(locus);
+	}
+
+	currentClusterWeight = this.clustersCurrentWeight.get(clusterId);
 	this.nodesByCluster.get(clusterId).remove(new Integer(locus));
 	this.clustersCurrentWeight.set(clusterId, currentClusterWeight - instance.getNodeWeights()[locus]);
-	this.fitness = this.fitness - nodeContribution;
+	
+	if(updateFitness) {
+	    this.fitness = this.fitness - nodeContribution;
+	}
+	
 	this.codification[locus] = -1;
     }
     
@@ -106,6 +113,23 @@ public class CCPChromosome extends Chromosome {
 	}
 	
 	return false;
+    }
+    
+    public void moveNodeCluster(int locus, int targetClusterId) {
+	double currentContribution = 0.0;
+	double targetClusterWeight = 0.0;
+
+	try {
+	    targetClusterWeight = this.clustersCurrentWeight.get(targetClusterId)
+		    + this.instance.getNodeWeights()[locus];
+	    this.getCodification()[locus] = targetClusterId;
+	    this.nodesByCluster.get(targetClusterId).add(new Integer(locus));
+	    currentContribution = computeNodeContributionInCluster(locus);
+	    this.fitness += currentContribution;
+	    this.clustersCurrentWeight.set(targetClusterId, targetClusterWeight);
+	} catch (Exception ex) {
+	    ex.printStackTrace();
+	}
     }
     
     public boolean canSetAllele(int locus, Integer targetClusterId) throws Exception {
