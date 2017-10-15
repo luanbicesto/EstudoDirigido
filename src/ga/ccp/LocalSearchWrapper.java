@@ -211,7 +211,7 @@ public class LocalSearchWrapper {
 	//chromosome.verifyFitness();
     }
     
-    private void swapNodes(int node1, int node2, double swapImprovement, CCPChromosome chromosome) throws Exception {
+    public void swapNodes(int node1, int node2, double swapImprovement, CCPChromosome chromosome) throws Exception {
 	double[] nodeWeight = new double[2];
 	double[] futureClustersWeight = new double[2];
 	int[] clusterOfNodes = {0,0};
@@ -238,7 +238,7 @@ public class LocalSearchWrapper {
 	chromosome.getNodesByCluster().get(clusterNode2).add(node1);
     }
     
-    private double computeSwapImprovement(int node1, int node2, CCPChromosome chromosome) {
+    public double computeSwapImprovement(int node1, int node2, CCPChromosome chromosome) {
 	double swapImprovement = 0.0;
 	int[] clusterOfNodes = {0,0};
 	double[] originalContribution = {0.0, 0.0};
@@ -271,7 +271,7 @@ public class LocalSearchWrapper {
 	return swapImprovement;
     }
     
-    private boolean canSwapNodes(int node1, int node2, CCPChromosome chromosome, int[] clusterOfNodes) throws Exception {
+    public boolean canSwapNodes(int node1, int node2, CCPChromosome chromosome, int[] clusterOfNodes) throws Exception {
 	double[] nodeWeight = new double[2];
 	double[] futureClustersWeight = new double[2];
 	

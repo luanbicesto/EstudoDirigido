@@ -3,6 +3,7 @@ package ga.ccp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
@@ -190,11 +191,37 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 	newCluster = rng.nextInt(instance.getK());
 	try {
-	    chromosome.setAllele(locus, newCluster);
+	    if(!chromosome.setAllele(locus, newCluster)) {
+		//mutateGeneSwap(chromosome, locus, newCluster);
+	    }
 	} catch (Exception e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
+    }
+    
+    private void mutateGeneSwap(CCPChromosome chromosome, int locus, int targetCluster) {
+	ArrayList<Integer> allNodesTargetCluster = null;
+	double swapImprovement = 0.0;
+	
+	allNodesTargetCluster = new ArrayList<Integer>(chromosome.getNodesByCluster().get(targetCluster));
+	Iterator<Integer> iterator = allNodesTargetCluster.iterator();
+	
+	while(iterator.hasNext()) {
+	    Integer node = iterator.next();
+	    
+	    swapImprovement = localSearch.computeSwapImprovement(locus, node, chromosome);
+	    if(swapImprovement >= 1.0) {
+		try {
+		    localSearch.swapNodes(locus, node, swapImprovement, chromosome);
+		} catch (Exception e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
+		break;
+	    }
+	}
+	
     }
 
     @Override
