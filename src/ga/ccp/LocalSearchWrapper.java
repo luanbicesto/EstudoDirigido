@@ -49,11 +49,21 @@ public class LocalSearchWrapper {
 	    }
 	    break;
 	case TripleSwap:
-	    applyNSwap(chromosome, 3);
+	    //applyNSwap(chromosome, 3);
+	    applyNSwapTimes(chromosome, CCPParameters.NUMBER_TRIPLE_SWAP_EXECUTIONS, 3);
+	    break;
+	case QuadrupleSwap:
+	    applyNSwapTimes(chromosome, CCPParameters.NUMBER_QUADRUPLE_SWAP_EXECUTIONS, 4);
 	    break;
 
 	default:
 	    break;
+	}
+    }
+    
+    private void applyNSwapTimes(CCPChromosome chromosome, int times, int n) {
+	for(int i = 0; i < times; i ++) {
+	    applyNSwap(chromosome, n);
 	}
     }
     

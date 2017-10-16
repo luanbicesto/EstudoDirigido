@@ -189,6 +189,10 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	    localSearch.applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, applyToAllNodes);
 	}
 	
+	if(CCPParameters.ENABLE_QUADRUPLE_SWAP) {
+	    localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
+	}
+	
     }
     
     private void mutateGene(CCPChromosome chromosome, int locus) {
