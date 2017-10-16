@@ -50,9 +50,6 @@ public abstract class AbstractGA<C extends Chromosome> {
 	    population = newpopulation;
 	    offspringBestChromosome = getBestChromosome(population);
 	    
-	    if(GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
-		applyLocalSearch(offspringBestChromosome, false);
-	    }
 	    if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
 		bestChromosome = offspringBestChromosome;
 		if (verbose) {
@@ -89,11 +86,18 @@ public abstract class AbstractGA<C extends Chromosome> {
 	int chromosomeIndex = 0;
 	C chromosome = null;
 	int numberHybridCromossomes = 0;
+	C offspringBestChromosome = null;
 	
 	if (GAConfiguration.ENABLE_HYBRID_POPULATION && 
-	    //rng2.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
 	    rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
 	    numberHybridCromossomes = GAConfiguration.ABSOLUTE_HYBRID_POPULATION;
+	    
+	    if(GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
+		offspringBestChromosome = getBestChromosome(population);
+		applyLocalSearch(offspringBestChromosome, false);
+		numberHybridCromossomes--;
+	    }
+	    
 	    for (int i = 0; i < numberHybridCromossomes; i++) {
 		chromosomeIndex = rng.nextInt(population.size());
 		chromosome = population.get(chromosomeIndex);
