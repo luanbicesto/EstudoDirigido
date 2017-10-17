@@ -20,9 +20,11 @@ public class InstanceReader {
 	CCPInstanceEntity instance = null;
 	switch (instanceType) {
 	case RanReal240:
-	    instance = handleRanReal(instanceName);
+	    instance = handleRanReal(instanceName, "RanReal240");
 	    break;
-
+	case RanReal480:
+	    instance = handleRanReal(instanceName, "RanReal480");
+	    break;
 	default:
 	    break;
 	}
@@ -30,9 +32,9 @@ public class InstanceReader {
 	return instance;
     }
     
-    private static CCPInstanceEntity handleRanReal(String instanceName) throws Exception{
+    private static CCPInstanceEntity handleRanReal(String instanceName, String folderName) throws Exception{
 	CCPInstanceEntity instance = new CCPInstanceEntity();
-	String filePath = INSTANCE_FOLDER + "RanReal240/" + instanceName;
+	String filePath = INSTANCE_FOLDER + folderName + "/" + instanceName;
 	
 	Reader fileInst = new BufferedReader(new FileReader(filePath));
 	StreamTokenizer tokenizer = new StreamTokenizer(fileInst);

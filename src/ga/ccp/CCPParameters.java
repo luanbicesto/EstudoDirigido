@@ -1,5 +1,7 @@
 package ga.ccp;
 
+import common.instance.reader.InstanceReader.InstanceType;
+
 public class CCPParameters {
     /*CROSSOVER*/
     public enum SelectParentsTypeEnum {
@@ -13,7 +15,8 @@ public class CCPParameters {
     public static final boolean ORDERED_CROSSOVER_ENABLED = false;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "RanReal240_01.txt";
+    public static final String INSTANCE_NAME = "RanReal480_01.txt";
+    public static InstanceType INSTANCE_TYPE = InstanceType.RanReal480; 
     
     /*Local Search*/
     public enum LocalSearchStrategy {

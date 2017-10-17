@@ -18,7 +18,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     private LocalSearchWrapper localSearch;
     
     public static void main(String[] args) throws Exception {
-	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, CCPParameters.INSTANCE_NAME);
+	CCPInstanceEntity instance = InstanceReader.readerInstance(CCPParameters.INSTANCE_TYPE, CCPParameters.INSTANCE_NAME);
 	GA_CCP ccp = new GA_CCP(instance);
 	ccp.solve();
     }
