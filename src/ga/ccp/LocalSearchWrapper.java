@@ -61,6 +61,47 @@ public class LocalSearchWrapper {
 	}
     }
     
+    public void applyOriginalLocalSearch(CCPChromosome chromosome) {
+	ArrayList<Integer> idsLocalSearchTypes = new ArrayList<>();
+	ArrayList<Integer> idsLocalSearchTypesCopy = null;
+	int idLocalSearch = 0;
+	int numberOfLs = 3;
+	boolean hadImprovement = true;
+	double originalFitness = 0.0;
+	
+	for(int i = 0; i < numberOfLs; i++) {
+	    idsLocalSearchTypes.add(i);
+	}
+	idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
+	
+	while(hadImprovement || idsLocalSearchTypesCopy.size() > 0) {
+	    originalFitness = chromosome.getFitness();
+	    idLocalSearch = idsLocalSearchTypesCopy.get(rng.nextInt(idsLocalSearchTypesCopy.size()));
+	    switch (idLocalSearch) {
+	    case 0:
+		applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, false);
+		break;
+	    case 1:
+		applyLocalSearch(LocalSearchStrategy.Swap, chromosome, false);
+		break;
+	    case 2:
+		applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, false);
+		break;
+
+	    default:
+		break;
+	    }
+	    
+	    hadImprovement = (chromosome.getFitness() - originalFitness) > 0.5;
+	    if(!hadImprovement) {
+		idsLocalSearchTypesCopy.remove(new Integer(idLocalSearch));
+	    } else {
+		idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
+	    }
+	}
+	
+    }
+    
     private void applyNSwapTimes(CCPChromosome chromosome, int times, int n) {
 	for(int i = 0; i < times; i ++) {
 	    applyNSwap(chromosome, n);

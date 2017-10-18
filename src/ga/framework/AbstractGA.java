@@ -23,6 +23,7 @@ public abstract class AbstractGA<C extends Chromosome> {
     public abstract Population<C> mutate(Population<C> offsprings);
     public abstract Population<C> selectNextPopulation(Population<C> offsprings);
     public abstract void applyLocalSearch(C chromosome, boolean applyToAllNodes);
+    public abstract void applyOriginalLocalSearch(C chromosome, boolean applyToAllNodes);
     
     public AbstractGA() {
 	this.generations = GAConfiguration.NUMBER_GENERATIONS;
@@ -86,6 +87,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	int chromosomeIndex = 0;
 	C chromosome = null;
 	int numberHybridCromossomes = 0;
+	int numberOriginalLsCromossomes = 0;
 	C offspringBestChromosome = null;
 	
 	if (GAConfiguration.ENABLE_HYBRID_POPULATION && 
@@ -102,6 +104,16 @@ public abstract class AbstractGA<C extends Chromosome> {
 		chromosomeIndex = rng.nextInt(population.size());
 		chromosome = population.get(chromosomeIndex);
 		applyLocalSearch(chromosome, false);
+	    }
+	}
+	
+	if(GAConfiguration.ENABLE_ORIGINAL_LS_POPULATION && 
+	   rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_ORIGINAL_LOCAL_SEARCH) {
+	    numberOriginalLsCromossomes = GAConfiguration.ABSOLUTE_ORIGINAL_LOCAL_SEARCH_POPULATION;
+	    for (int i = 0; i < numberOriginalLsCromossomes; i++) {
+		chromosomeIndex = rng.nextInt(population.size());
+		chromosome = population.get(chromosomeIndex);
+		applyOriginalLocalSearch(chromosome, false);
 	    }
 	}
     }

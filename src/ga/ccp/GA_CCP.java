@@ -195,6 +195,10 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	
     }
     
+    public void applyOriginalLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
+	localSearch.applyOriginalLocalSearch(chromosome);
+    }
+    
     private void mutateGene(CCPChromosome chromosome, int locus) {
 	int newCluster = 0;
 
