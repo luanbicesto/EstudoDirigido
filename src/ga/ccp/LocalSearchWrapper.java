@@ -77,6 +77,19 @@ public class LocalSearchWrapper {
 	while(hadImprovement || idsLocalSearchTypesCopy.size() > 0) {
 	    originalFitness = chromosome.getFitness();
 	    idLocalSearch = idsLocalSearchTypesCopy.get(rng.nextInt(idsLocalSearchTypesCopy.size()));
+	    applyLocalSearchById(chromosome, idLocalSearch);
+	    
+	    hadImprovement = (chromosome.getFitness() - originalFitness) > 0.5;
+	    if(!hadImprovement) {
+		idsLocalSearchTypesCopy.remove(new Integer(idLocalSearch));
+	    } else {
+		idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
+	    }
+	}
+	
+    }
+    
+    public void applyLocalSearchById(CCPChromosome chromosome, int idLocalSearch) {
 	    switch (idLocalSearch) {
 	    case 0:
 		applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, false);
@@ -91,15 +104,6 @@ public class LocalSearchWrapper {
 	    default:
 		break;
 	    }
-	    
-	    hadImprovement = (chromosome.getFitness() - originalFitness) > 0.5;
-	    if(!hadImprovement) {
-		idsLocalSearchTypesCopy.remove(new Integer(idLocalSearch));
-	    } else {
-		idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
-	    }
-	}
-	
     }
     
     private void applyNSwapTimes(CCPChromosome chromosome, int times, int n) {

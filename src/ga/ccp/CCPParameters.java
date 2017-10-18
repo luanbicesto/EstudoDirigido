@@ -25,9 +25,11 @@ public class CCPParameters {
 	TripleSwap,
 	QuadrupleSwap
     }
+    public static final boolean ENABLE_ONLY_ONE_LOCAL_SEARCH = false;
+    public static final int NUMBER_LOCAL_SEARCH_TYPE = 3;
     public static final boolean ENABLE_ONE_CHANGE = true;
     public static final boolean ENABLE_SWAP = true;
-    public static final boolean ENABLE_TRIPLE_SWAP = false;
+    public static final boolean ENABLE_TRIPLE_SWAP = true;
     public static final boolean ENABLE_QUADRUPLE_SWAP = false;
     public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_SWAP = 0.01;
     public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_ONE_CHANGE = 0.02;

@@ -177,22 +177,27 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     @Override
     public void applyLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
-	if(CCPParameters.ENABLE_ONE_CHANGE) {
-	    localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, applyToAllNodes);
+	if (CCPParameters.ENABLE_ONLY_ONE_LOCAL_SEARCH) {
+	    localSearch.applyLocalSearchById(chromosome, rng.nextInt(CCPParameters.NUMBER_LOCAL_SEARCH_TYPE));
+
+	} else {
+	    if (CCPParameters.ENABLE_ONE_CHANGE) {
+		localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, applyToAllNodes);
+	    }
+
+	    if (CCPParameters.ENABLE_SWAP) {
+		localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
+	    }
+
+	    if (CCPParameters.ENABLE_TRIPLE_SWAP) {
+		localSearch.applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, applyToAllNodes);
+	    }
+
+	    if (CCPParameters.ENABLE_QUADRUPLE_SWAP) {
+		localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
+	    }
 	}
-	
-	if(CCPParameters.ENABLE_SWAP) {
-	    localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
-	}
-	
-	if(CCPParameters.ENABLE_TRIPLE_SWAP) {
-	    localSearch.applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, applyToAllNodes);
-	}
-	
-	if(CCPParameters.ENABLE_QUADRUPLE_SWAP) {
-	    localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
-	}
-	
+
     }
     
     public void applyOriginalLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
