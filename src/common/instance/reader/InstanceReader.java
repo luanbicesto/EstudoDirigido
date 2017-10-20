@@ -25,6 +25,9 @@ public class InstanceReader {
 	case RanReal480:
 	    instance = handleRanReal(instanceName, "RanReal480");
 	    break;
+	case Sparse82:
+		instance = handleRanReal(instanceName, "Sparse82");
+		break;
 	default:
 	    break;
 	}
