@@ -15,8 +15,8 @@ public class CCPParameters {
     public static final boolean ORDERED_CROSSOVER_ENABLED = false;
     /*CROSSOVER*/
     
-    public static final String INSTANCE_NAME = "Sparse82_02.txt";
-    public static InstanceType INSTANCE_TYPE = InstanceType.Sparse82; 
+    public static final String INSTANCE_NAME = "RanReal480_01.txt";
+    public static InstanceType INSTANCE_TYPE = InstanceType.RanReal480; 
     
     /*Local Search*/
     public enum LocalSearchStrategy {

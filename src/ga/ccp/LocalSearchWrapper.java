@@ -340,7 +340,7 @@ public class LocalSearchWrapper {
 	default:
 	    break;
 	}
-	return (int)Math.round((instance.getN() * percentageNodes));
+	return (int)Math.ceil((instance.getN() * percentageNodes));
     }
     
     private void migrateNode(int node, int targetCluster, CCPChromosome chromosome, double fitnessDifference) throws Exception {

@@ -16,6 +16,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     
     private CCPInstanceEntity instance;
     private LocalSearchWrapper localSearch;
+    private ArrayList<Integer> localSearchTypes;
     
     public static void main(String[] args) throws Exception {
 	CCPInstanceEntity instance = InstanceReader.readerInstance(CCPParameters.INSTANCE_TYPE, CCPParameters.INSTANCE_NAME);
@@ -23,11 +24,16 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	ccp.solve();
     }
     
-    public GA_CCP(CCPInstanceEntity instance) {
-	super();
-	this.instance = instance;
-	this.localSearch = new LocalSearchWrapper(instance, rng);
-    }
+	public GA_CCP(CCPInstanceEntity instance) {
+		super();
+		this.instance = instance;
+		this.localSearch = new LocalSearchWrapper(instance, rng);
+		this.localSearchTypes = new ArrayList<>(CCPParameters.NUMBER_LOCAL_SEARCH_TYPE);
+		
+		for(int i = 0; i < CCPParameters.NUMBER_LOCAL_SEARCH_TYPE; i++) {
+			localSearchTypes.add(i);
+		}
+	}
 
     @Override
     public CCPPopulation initializePopulation() {
@@ -176,29 +182,39 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
     }
     
     @Override
-    public void applyLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
-	if (CCPParameters.ENABLE_ONLY_ONE_LOCAL_SEARCH) {
-	    localSearch.applyLocalSearchById(chromosome, rng.nextInt(CCPParameters.NUMBER_LOCAL_SEARCH_TYPE));
+	public void applyLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
+		ArrayList<Integer> typesOfLocalSearch = new ArrayList<>(this.localSearchTypes);
+		
+    	if (CCPParameters.ENABLE_ONLY_ONE_LOCAL_SEARCH) {
+			localSearch.applyLocalSearchById(chromosome, rng.nextInt(CCPParameters.NUMBER_LOCAL_SEARCH_TYPE));
 
-	} else {
-	    if (CCPParameters.ENABLE_ONE_CHANGE) {
-		localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, applyToAllNodes);
-	    }
+		} else {
+			if (CCPParameters.ENABLE_ONE_CHANGE) {
+				localSearch.applyLocalSearch(LocalSearchStrategy.OneChange, chromosome, applyToAllNodes);
+			}
 
-	    if (CCPParameters.ENABLE_SWAP) {
-		localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
-	    }
+			if (CCPParameters.ENABLE_SWAP) {
+				localSearch.applyLocalSearch(LocalSearchStrategy.Swap, chromosome, applyToAllNodes);
+			}
 
-	    if (CCPParameters.ENABLE_TRIPLE_SWAP) {
-		localSearch.applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, applyToAllNodes);
-	    }
+			if (CCPParameters.ENABLE_TRIPLE_SWAP) {
+				localSearch.applyLocalSearch(LocalSearchStrategy.TripleSwap, chromosome, applyToAllNodes);
+			}
 
-	    if (CCPParameters.ENABLE_QUADRUPLE_SWAP) {
-		localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
-	    }
+			if (CCPParameters.ENABLE_QUADRUPLE_SWAP) {
+				localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
+			}
+		}
+		
+		/*while(typesOfLocalSearch.size() > 0) {
+			int indexLs = rng.nextInt(typesOfLocalSearch.size());
+			int localSearchType = typesOfLocalSearch.get(indexLs);
+			
+			localSearch.applyLocalSearchById(chromosome, localSearchType);
+			typesOfLocalSearch.remove(new Integer(localSearchType));
+		}*/
+
 	}
-
-    }
     
     public void applyOriginalLocalSearch(CCPChromosome chromosome, boolean applyToAllNodes) {
 	localSearch.applyOriginalLocalSearch(chromosome);
