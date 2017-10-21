@@ -1,11 +1,12 @@
 package ga.framework;
 
 public class GAConfiguration {
-    public static final long TOTAL_RUNNING_TIME = 3;
+    public static final long TOTAL_RUNNING_TIME = 60;
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
     public static final double MUTATION_RATE = 0.5 / (double)POPULATION_SIZE;
-    public static boolean ENABLE_MUTATION_SWAP = false;
+    public static boolean ENABLE_MUTATION_SWAP = true;
+    public static boolean ENABLE_CROSSOVER_SWAP = false;
     
     public static boolean ENABLE_HYBRID_POPULATION = true;
     public static boolean ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS = false;

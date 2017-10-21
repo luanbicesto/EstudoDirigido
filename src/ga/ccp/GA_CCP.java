@@ -162,7 +162,9 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	private void crossover(CCPChromosome parent, CCPChromosome offspring, int locusIndex) {
 		int parentClusterId = parent.getCodification()[locusIndex];
 		try {
-			offspring.setAllele(locusIndex, parentClusterId);
+			if(!offspring.setAllele(locusIndex, parentClusterId) && GAConfiguration.ENABLE_CROSSOVER_SWAP) {
+				mutateGeneSwap(offspring, locusIndex, parentClusterId);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -242,26 +244,28 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		int nodeIndex = 0;
 
 		allNodesTargetCluster = new ArrayList<Integer>(chromosome.getNodesByCluster().get(targetCluster));
-		Iterator<Integer> iterator = allNodesTargetCluster.iterator();
+		// Iterator<Integer> iterator = allNodesTargetCluster.iterator();
 
-		while (iterator.hasNext()) {
-			nodeIndex = rng.nextInt(allNodesTargetCluster.size());
-			Integer node = allNodesTargetCluster.get(nodeIndex);
+		// while (iterator.hasNext()) {
+		nodeIndex = rng.nextInt(allNodesTargetCluster.size());
+		Integer node = allNodesTargetCluster.get(nodeIndex);
+		swapImprovement = localSearch.computeSwapImprovement(locus, node, chromosome);
 
-			swapImprovement = localSearch.computeSwapImprovement(locus, node, chromosome);
-			if (swapImprovement >= 1.0) {
-				try {
-					localSearch.swapNodes(locus, node, swapImprovement, chromosome);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				break;
-			} else {
-				allNodesTargetCluster.remove(node);
+		if (node != locus && swapImprovement != 0.0) {
+
+			// if (swapImprovement >= 1.0) {
+			try {
+				localSearch.swapNodes(locus, node, swapImprovement, chromosome);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			// break;
+			// } else {
+			// allNodesTargetCluster.remove(node);
+			// }
+			// }
 		}
-
 	}
 
 	@Override
