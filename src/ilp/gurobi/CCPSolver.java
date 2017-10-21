@@ -21,17 +21,56 @@ public class CCPSolver {
     private double[] lowerBound;
     private double[] upperBound;
     
-    public static void main(String[] args) throws Exception{
-	CCPSolver solver = new CCPSolver();
-        solver.solve();
+	public static void main(String[] args) throws Exception {
+		CCPSolver solver = new CCPSolver();
+		solver.solve();
+	}
+    
+    public CCPSolver() {
+    	try {
+			env = new GRBEnv("ccpQuadratic.log");
+		} catch (GRBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
+    
+    public GRBModel getModel() {
+		return model;
+	}
+
+	public void setModel(GRBModel model) {
+		this.model = model;
+	}
+
+	public void optimize() throws Exception {
+		model.optimize();
+	}
+	
+	public void newModel() throws Exception {
+		this.model = new GRBModel(env); 
+	}
+	
+	public Integer[] getSolution() throws Exception {
+		Integer[] solution = new Integer[n];
+		
+		for(int i = 0; i < n; i++) {
+            for(int k = 0; k < p; k++) {
+                if(elements[i][k].get(GRB.DoubleAttr.X) > 0.95) {
+                	solution[i] = k;
+                }
+            }
+        }
+		
+		return solution;
+	}
     
     public void solve() throws Exception{
         try {
-            env = new GRBEnv("ccpQuadratic.log");
+            
             model = new GRBModel(env);
             model.set(GRB.DoubleParam.TimeLimit, SolverParameters.TIME_LIMIT);
-            readInstance();
+            readInstance(InstanceReader.InstanceType.RanReal240, SolverParameters.INSTANCE_NAME);
             createVars();
             addObjectiveFunctionQuadratic();
             addElementOnlyOneClusterConstraint();
@@ -52,15 +91,15 @@ public class CCPSolver {
         }
     }
     
-    private void readInstance() throws Exception {
-	CCPInstanceEntity instance = InstanceReader.readerInstance(InstanceReader.InstanceType.RanReal240, SolverParameters.INSTANCE_NAME);
-        n = instance.getN();
-	p = instance.getK();
-	edgeWeights = instance.getEdgeWeights();
-	nodeWeights = instance.getNodeWeights();
-	lowerBound = instance.getLowerBound();
-	upperBound = instance.getUpperBound();
-    }
+	public void readInstance(InstanceReader.InstanceType instanceType, String instanceName) throws Exception {
+		CCPInstanceEntity instance = InstanceReader.readerInstance(instanceType, instanceName);
+		n = instance.getN();
+		p = instance.getK();
+		edgeWeights = instance.getEdgeWeights();
+		nodeWeights = instance.getNodeWeights();
+		lowerBound = instance.getLowerBound();
+		upperBound = instance.getUpperBound();
+	}
     
     private void createVars() throws GRBException{
         elements = new GRBVar[n][p];
@@ -71,7 +110,29 @@ public class CCPSolver {
         }
     }
     
-    private void addObjectiveFunctionQuadratic() throws GRBException{
+    public void createVarsFromSolution(Integer[] solution) throws GRBException{
+        elements = new GRBVar[n][p];
+        double variableValue = 0.0;
+        
+        for(int i = 0; i < n; i++) {
+            for(int k = 0; k < p; k++) {
+            	variableValue = solution[i] == k ? 1.0 : 0.0;
+                elements[i][k] = model.addVar(0.0, 1.0, variableValue, GRB.BINARY, "x" + Integer.toString(i) + "_" + Integer.toString(k));
+            }
+        }
+    }
+    
+    public void addMathHeuristicConstraint(int p, Integer[] solution) throws GRBException {
+    	GRBLinExpr expr = new GRBLinExpr();
+    	
+    	for(int i = 0; i < solution.length; i++) {
+    		expr.addTerm(1.0, elements[i][solution[i]]);
+    	}
+    	
+    	model.addConstr(expr, GRB.GREATER_EQUAL, n - p, "mathHeuristic");
+    }
+    
+    public void addObjectiveFunctionQuadratic() throws GRBException{
         GRBQuadExpr expr = new GRBQuadExpr();
         for(int k = 0; k < p; k++) {
             for(int i = 0; i < n-1; i++) {
@@ -83,7 +144,7 @@ public class CCPSolver {
         model.setObjective(expr, GRB.MAXIMIZE);
     }
         
-    private void addElementOnlyOneClusterConstraint() throws GRBException {
+    public void addElementOnlyOneClusterConstraint() throws GRBException {
         GRBLinExpr expr;
         for(int i = 0; i < n; i++) {
             expr = new GRBLinExpr();
@@ -94,7 +155,7 @@ public class CCPSolver {
         }
     }
     
-    private void addLimitsConstraint() throws GRBException{
+    public void addLimitsConstraint() throws GRBException{
         GRBLinExpr expr;
         for(int k = 0; k < p; k++) {
             expr = new GRBLinExpr();
