@@ -6,6 +6,7 @@ import java.util.Random;
 
 import common.instance.reader.CCPInstanceEntity;
 import ga.ccp.CCPParameters.LocalSearchStrategy;
+import ga.framework.GAConfiguration;
 
 public class LocalSearchWrapper {
 
@@ -69,13 +70,15 @@ public class LocalSearchWrapper {
 		int numberOfLs = 3;
 		boolean hadImprovement = true;
 		double originalFitness = 0.0;
+		int timesImproved = 0;
 
 		for (int i = 0; i < numberOfLs; i++) {
 			idsLocalSearchTypes.add(i);
 		}
 		idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
 
-		while (hadImprovement || idsLocalSearchTypesCopy.size() > 0) {
+		while (hadImprovement && idsLocalSearchTypesCopy.size() > 0 
+				&& timesImproved <= GAConfiguration.ABSOLUTE_ORIGINAL_LOCAL_SEARCH_TIMES) {
 			originalFitness = chromosome.getFitness();
 			idLocalSearch = idsLocalSearchTypesCopy.get(rng.nextInt(idsLocalSearchTypesCopy.size()));
 			applyLocalSearchById(chromosome, idLocalSearch);
@@ -84,6 +87,7 @@ public class LocalSearchWrapper {
 			if (!hadImprovement) {
 				idsLocalSearchTypesCopy.remove(new Integer(idLocalSearch));
 			} else {
+				timesImproved++;
 				idsLocalSearchTypesCopy = new ArrayList<>(idsLocalSearchTypes);
 			}
 		}

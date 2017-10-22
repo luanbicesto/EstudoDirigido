@@ -5,7 +5,7 @@ public class GAConfiguration {
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
     public static final double MUTATION_RATE = 0.5 / (double)POPULATION_SIZE;
-    public static boolean ENABLE_MUTATION_SWAP = true;
+    public static boolean ENABLE_MUTATION_SWAP = false;
     public static boolean ENABLE_CROSSOVER_SWAP = false;
     
     public static boolean ENABLE_HYBRID_POPULATION = true;
@@ -14,8 +14,9 @@ public class GAConfiguration {
     public static int ABSOLUTE_HYBRID_POPULATION = 70;
     public static double PERCENTAGE_APPLY_HYBRID_TRANSFORMATION = 0.6;
     
+    public static int ABSOLUTE_ORIGINAL_LOCAL_SEARCH_TIMES = 1;
     public static double PERCENTAGE_APPLY_ORIGINAL_LOCAL_SEARCH = 0.1;
-    public static int ABSOLUTE_ORIGINAL_LOCAL_SEARCH_POPULATION = 10;
+    public static int ABSOLUTE_ORIGINAL_LOCAL_SEARCH_POPULATION = 1;
     public static boolean ENABLE_ORIGINAL_LS_POPULATION = false;
     
     /*New population*/
