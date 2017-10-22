@@ -53,13 +53,23 @@ public class CCPChromosome extends Chromosome {
 		return clone;
 	}
 
-	public void removeNodeFromCluster(int locus, boolean updateFitness) throws Exception {
+	public void updateClusterControls(int node) throws Exception {
+		int clusterId = 0;
+		double currentClusterWeight;
+		
+		clusterId = this.codification[node];
+		currentClusterWeight = this.clustersCurrentWeight.get(clusterId);
+		this.nodesByCluster.get(clusterId).add(new Integer(node));
+		this.clustersCurrentWeight.set(clusterId, currentClusterWeight + instance.getNodeWeights()[node]);
+	}
+	
+	public void removeNodeFromCluster(int locus, boolean logicalRemoval) throws Exception {
 		double nodeContribution = 0.0;
 		double currentClusterWeight = 0.0;
 		int clusterId = 0;
 
 		clusterId = this.codification[locus];
-		if (updateFitness) {
+		if (!logicalRemoval) {
 			nodeContribution = computeNodeContributionInCluster(locus);
 		}
 
@@ -67,11 +77,10 @@ public class CCPChromosome extends Chromosome {
 		this.nodesByCluster.get(clusterId).remove(new Integer(locus));
 		this.clustersCurrentWeight.set(clusterId, currentClusterWeight - instance.getNodeWeights()[locus]);
 
-		if (updateFitness) {
+		if (!logicalRemoval) {
 			this.fitness = this.fitness - nodeContribution;
+			this.codification[locus] = -1;
 		}
-
-		this.codification[locus] = -1;
 	}
 
 	public boolean setAllele(int locus, Integer targetClusterId) throws Exception {

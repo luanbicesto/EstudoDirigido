@@ -232,7 +232,7 @@ public class LocalSearchWrapper {
 		// remove nodes from original clusters
 		for (int i = 0; i < nodes.size(); i++) {
 			try {
-				chromosome.removeNodeFromCluster(nodes.get(i), true);
+				chromosome.removeNodeFromCluster(nodes.get(i), false);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -356,7 +356,7 @@ public class LocalSearchWrapper {
 		chromosome.addToFitness(fitnessDifference);
 	}
 
-	private double computeOneChangeImprovement(int node, int targetCluster, CCPChromosome chromosome) throws Exception {
+	public double computeOneChangeImprovement(int node, int targetCluster, CCPChromosome chromosome) throws Exception {
 		double improvement = 0.0;
 		int originalCluster = 0;
 
@@ -386,7 +386,7 @@ public class LocalSearchWrapper {
 		return improvement;
 	}
 
-	private boolean canMigrateToCluster(int node, int targetCluster, CCPChromosome chromosome) {
+	public boolean canMigrateToCluster(int node, int targetCluster, CCPChromosome chromosome) {
 		return canMigrateToCluster(node, targetCluster, chromosome, true);
 	}
 
