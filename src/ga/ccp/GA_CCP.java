@@ -3,7 +3,6 @@ package ga.ccp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
@@ -80,12 +79,26 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		CCPPopulation offspring = new CCPPopulation();
 		double maxNumberLocusCrossover = 0.0;
 
-		maxNumberLocusCrossover = instance.getN() * CCPParameters.MAX_PERCENTAGE_LOCUS_CROSSOVER;
-		for (int i = 0; i < popSize; i = i + 2) {
-			createOffspring(parents, offspring, maxNumberLocusCrossover);
+		if (rng.nextDouble() < GAConfiguration.CROSSOVER_PERCENTAGE) {
+			maxNumberLocusCrossover = instance.getN() * CCPParameters.MAX_PERCENTAGE_LOCUS_CROSSOVER;
+			for (int i = 0; i < popSize; i = i + 2) {
+				createOffspring(parents, offspring, maxNumberLocusCrossover);
+			}
+		} else {
+			//offspring = duplicatePopulation((CCPPopulation)parents);
+			offspring = (CCPPopulation)parents;
 		}
 
 		return offspring;
+	}
+	
+	private CCPPopulation duplicatePopulation(CCPPopulation population) {
+		CCPPopulation duplicatedPop = new CCPPopulation();
+		for(int i = 0; i < population.size(); i++) {
+			duplicatedPop.add(population.get(i).clone());
+		}
+		
+		return duplicatedPop;
 	}
 
 	private void createOffspring(Population<CCPChromosome> parents, CCPPopulation offspring,
@@ -173,10 +186,13 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 	@Override
 	public Population<CCPChromosome> mutate(Population<CCPChromosome> offsprings) {
+		
 		for (CCPChromosome chromosome : offsprings) {
-			for (int i = 0; i < chromosome.getCodification().length; i++) {
-				if (rng.nextDouble() < mutationRate) {
-					mutateGene(chromosome, i);
+			if (rng.nextDouble() < GAConfiguration.MUTATION_PERCENTAGE) {
+				for (int i = 0; i < chromosome.getCodification().length; i++) {
+					if (rng.nextDouble() < mutationRate) {
+						mutateGene(chromosome, i);
+					}
 				}
 			}
 		}
@@ -274,7 +290,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 		if (worst.getFitness() < bestChromosome.getFitness()) {
 			offsprings.remove(worst);
-			offsprings.add((CCPChromosome) bestChromosome);
+			offsprings.add(bestChromosome.clone());
 		}
 
 		return offsprings;

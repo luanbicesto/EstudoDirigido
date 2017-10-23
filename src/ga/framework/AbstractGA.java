@@ -58,7 +58,9 @@ public abstract class AbstractGA<C extends Chromosome> {
 			offspringBestChromosome = getBestChromosome(population);
 
 			if (offspringBestChromosome.getFitness() > bestChromosome.getFitness()) {
-				bestChromosome = offspringBestChromosome;
+				@SuppressWarnings("unchecked")
+				C clone = (C)offspringBestChromosome.clone();
+				bestChromosome = clone;
 				if (verbose) {
 					System.out.println("(Gen. " + g + ") BestSol = " + bestChromosome.getFitness());
 				}
