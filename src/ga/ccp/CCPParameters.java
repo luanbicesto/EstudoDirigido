@@ -29,7 +29,7 @@ public class CCPParameters {
 	public static final boolean ENABLE_TRIPLE_SWAP = true;
 	public static final boolean ENABLE_QUADRUPLE_SWAP = false;
 	public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_SWAP = 0.01;
-	public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_ONE_CHANGE = 0.02;
+	public static final double MAX_PERCENTAGE_NUMBER_NODES_LS_ONE_CHANGE = 0.03;
 	public static final int NUMBER_TRIPLE_SWAP_EXECUTIONS = 1;
 	public static final int NUMBER_QUADRUPLE_SWAP_EXECUTIONS = 10;
 	public static final boolean BEST_IMPROVING = false;
