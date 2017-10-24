@@ -33,4 +33,8 @@ public class GAConfiguration {
     public static int MAX_NUMBER_GENERATIONS_PlATO_TREATMENT = 5000;
     public static int MAX_VALUE_MUTATION_NUMERATOR = 4;
     public static double MINIMUM_IMPROVEMENT = 1.0;
+    
+    /*Parallel*/
+    public static final boolean PARALLEL_MUTATION = false;
+    public static final boolean PARALLEL_LOCAL_SEARCH = false;
 }

@@ -1,5 +1,6 @@
 package ga.framework;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
@@ -108,11 +109,23 @@ public abstract class AbstractGA<C extends Chromosome> {
 				numberHybridCromossomes--;
 			}
 
-			for (int i = 0; i < numberHybridCromossomes; i++) {
-				chromosomeIndex = rng.nextInt(population.size());
-				chromosome = population.get(chromosomeIndex);
-				applyLocalSearch(chromosome, false);
+			if(!GAConfiguration.PARALLEL_LOCAL_SEARCH) {
+				for (int i = 0; i < numberHybridCromossomes; i++) {
+					chromosomeIndex = rng.nextInt(population.size());
+					chromosome = population.get(chromosomeIndex);
+					applyLocalSearch(chromosome, false);
+				}
+			} else {
+				ArrayList<C> allChromosomes = new ArrayList<>();
+				for (int i = 0; i < numberHybridCromossomes; i++) {
+					chromosomeIndex = rng.nextInt(population.size());
+					chromosome = population.get(chromosomeIndex);
+					allChromosomes.add(chromosome);
+				}
+				
+				allChromosomes.parallelStream().forEach(c -> applyLocalSearch(c, false));
 			}
+			
 		}
 
 		if (GAConfiguration.ENABLE_ORIGINAL_LS_POPULATION

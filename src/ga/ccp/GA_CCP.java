@@ -187,17 +187,27 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	@Override
 	public Population<CCPChromosome> mutate(Population<CCPChromosome> offsprings) {
 		
-		for (CCPChromosome chromosome : offsprings) {
-			if (rng.nextDouble() < GAConfiguration.MUTATION_PERCENTAGE) {
-				for (int i = 0; i < chromosome.getCodification().length; i++) {
-					if (rng.nextDouble() < mutationRate) {
-						mutateGene(chromosome, i);
-					}
+		if(!GAConfiguration.PARALLEL_MUTATION) {
+			for (CCPChromosome chromosome : offsprings) {
+				mutateChromosome(chromosome);
+			}
+		} else {
+			offsprings.parallelStream()
+	          .forEach(e -> mutateChromosome(e));
+		}
+		
+
+		return offsprings;
+	}
+	
+	private void mutateChromosome(CCPChromosome chromosome) {
+		if (rng.nextDouble() < GAConfiguration.MUTATION_PERCENTAGE) {
+			for (int i = 0; i < chromosome.getCodification().length; i++) {
+				if (rng.nextDouble() < mutationRate) {
+					mutateGene(chromosome, i);
 				}
 			}
 		}
-
-		return offsprings;
 	}
 
 	@Override
