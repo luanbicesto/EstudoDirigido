@@ -1,20 +1,20 @@
 package ga.framework;
 
 public class GAConfiguration {
-    public static final long TOTAL_RUNNING_TIME = 180;
+    public static final long TOTAL_RUNNING_TIME = 60;
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
     public static final double MUTATION_RATE = 0.5 / (double)POPULATION_SIZE;
-    public static final double CROSSOVER_PERCENTAGE = 0.2;
-    public static final double MUTATION_PERCENTAGE = 0.6;
+    public static final double CROSSOVER_PERCENTAGE = 1;
+    public static final double MUTATION_PERCENTAGE = 1;
     public static boolean ENABLE_MUTATION_SWAP = false;
     public static boolean ENABLE_CROSSOVER_SWAP = false;
     
     public static boolean ENABLE_HYBRID_POPULATION = true;
     public static boolean ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS = false;
     public static int PERCENTAGE_HYBRID_POPULATION = 10; //not used
-    public static int ABSOLUTE_HYBRID_POPULATION = 60;
-    public static double PERCENTAGE_APPLY_HYBRID_TRANSFORMATION = 1;
+    public static int ABSOLUTE_HYBRID_POPULATION = 30;
+    public static double PERCENTAGE_APPLY_HYBRID_TRANSFORMATION = 0.6;
     
     public static int ABSOLUTE_ORIGINAL_LOCAL_SEARCH_TIMES = 1;
     public static double PERCENTAGE_APPLY_ORIGINAL_LOCAL_SEARCH = 0.1;

@@ -1,12 +1,13 @@
 package ga.ccp;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 import common.instance.reader.CCPInstanceEntity;
 import ga.ccp.CCPParameters.LocalSearchStrategy;
 import ga.framework.GAConfiguration;
+import ilp.gurobi.EmparelhamentoPerfeito;
 
 public class LocalSearchWrapper {
 
@@ -117,14 +118,44 @@ public class LocalSearchWrapper {
 		}
 	}
 
+	public HashMap<Integer, Integer> selectNodeCluster(int numberClusters, CCPChromosome chromosome) {
+		HashMap<Integer, Integer> clusterMapping = new HashMap<>();
+		ArrayList<Integer> clustersIds = new ArrayList<>(this.allClustersIndices);
+		ArrayList<Integer> clusters = new ArrayList<>();
+		ArrayList<Integer> nodesOfCluster = null;
+		int nodeIndex = -1;
+		int selectedNode = 0;
+
+		// select clusters
+		for (int i = 0; i < numberClusters; i++) {
+			int cluster = clustersIds.get(rng.nextInt(clustersIds.size()));
+			clusters.add(cluster);
+			clustersIds.remove(new Integer(cluster));
+		}
+
+		// select one node from each cluster
+		for (int i = 0; i < clusters.size(); i++) {
+			nodesOfCluster = chromosome.getNodesByCluster().get(clusters.get(i));
+			if (nodesOfCluster.size() == 0) {
+				return null;
+			}
+			nodeIndex = rng.nextInt(nodesOfCluster.size());
+			selectedNode = nodesOfCluster.get(nodeIndex);
+			clusterMapping.put(clusters.get(i), selectedNode);
+		}
+		
+		
+		return clusterMapping;
+	}
+	
 	private void applyNSwap(CCPChromosome chromosome, int n) {
 		ArrayList<Integer> clusters = new ArrayList<>(n);
 		ArrayList<Integer> nodes = new ArrayList<>(n);
-		ArrayList<Integer> nodesOfCluster = null;
+		double currentContribution = 0.0;
 		ArrayList<Integer> clustersIds = new ArrayList<>(this.allClustersIndices);
+		ArrayList<Integer> nodesOfCluster = null;
 		int nodeIndex = -1;
 		int selectedNode = 0;
-		double currentContribution = 0.0;
 
 		// select clusters
 		for (int i = 0; i < n; i++) {
@@ -132,9 +163,6 @@ public class LocalSearchWrapper {
 			clusters.add(cluster);
 			clustersIds.remove(new Integer(cluster));
 		}
-
-		// sort clusters
-		// Collections.sort(clusters);
 
 		// select one node from each cluster
 		for (int i = 0; i < clusters.size(); i++) {

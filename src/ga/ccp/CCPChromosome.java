@@ -79,7 +79,7 @@ public class CCPChromosome extends Chromosome {
 
 		if (!logicalRemoval) {
 			this.fitness = this.fitness - nodeContribution;
-			this.codification[locus] = -1;
+			//this.codification[locus] = -1;
 		}
 	}
 

@@ -10,11 +10,13 @@ import ga.ccp.CCPParameters.LocalSearchStrategy;
 import ga.framework.AbstractGA;
 import ga.framework.GAConfiguration;
 import ga.framework.Population;
+import ilp.gurobi.EmparelhamentoPerfeito;
 
 public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 	private CCPInstanceEntity instance;
 	private LocalSearchWrapper localSearch;
+	private EmparelhamentoPerfeito perfectMatch;
 	private ArrayList<Integer> localSearchTypes;
 
 	public static void main(String[] args) throws Exception {
@@ -33,6 +35,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		for (int i = 0; i < CCPParameters.NUMBER_LOCAL_SEARCH_TYPE; i++) {
 			localSearchTypes.add(i);
 		}
+		this.perfectMatch = new EmparelhamentoPerfeito(instance, rng);
 	}
 
 	@Override
@@ -232,6 +235,10 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 			if (CCPParameters.ENABLE_QUADRUPLE_SWAP) {
 				localSearch.applyLocalSearch(LocalSearchStrategy.QuadrupleSwap, chromosome, applyToAllNodes);
+			}
+			
+			if(CCPParameters.ENABLE_PERFECT_MATCH) {
+				perfectMatch.applyPerfectMatch(chromosome);
 			}
 		}
 

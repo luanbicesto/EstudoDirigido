@@ -1,12 +1,13 @@
 package ilp.gurobi;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import common.instance.reader.CCPInstanceEntity;
 import ga.ccp.CCPChromosome;
+import ga.ccp.CCPParameters;
 import ga.ccp.LocalSearchWrapper;
 import gurobi.GRB;
 import gurobi.GRBEnv;
@@ -38,31 +39,43 @@ public class EmparelhamentoPerfeito {
 	}
 	
 	public HashMap<Integer, Integer> computePerfectMatch(HashMap<Integer, Integer> currentMapping, CCPChromosome chromosome) throws Exception {
-		HashMap<Integer, Integer> hash = new HashMap<>();
 		ArrayList<Integer> clusters;
 		double[][] benefits;
 		
 		clusters = new ArrayList<>(currentMapping.keySet());
-		Collections.sort(clusters);
+		//Collections.sort(clusters);
 		benefits = computeBenefits(clusters, currentMapping, chromosome);
+		return solveLinearProgram(benefits, clusters, currentMapping);
 		
-		return hash;
 	}
 	
-	private HashMap<Integer, Integer> solveLinearProgram(double[][] benefits, ArrayList<Integer> clusters) throws GRBException {
+	private HashMap<Integer, Integer> solveLinearProgram(double[][] benefits, ArrayList<Integer> clusters, HashMap<Integer, Integer> currentMapping) throws GRBException {
 		model = new GRBModel(env);
+		model.set("OutputFlag", "0");
 		createVars(clusters);
 		addObjectiveFunction(clusters, benefits);
 		addOnlyOneTargetClusterRestriction(clusters);
+		addOnlyOneTargetClusterRestriction2(clusters);
 		model.optimize();
 		
-		return extractNewMatch(model);
+		return extractNewMatch(model, currentMapping);
 	}
 	
-	private HashMap<Integer, Integer> extractNewMatch(GRBModel model) {
-		HashMap<Integer, Integer> hash = new HashMap<>();
+	private HashMap<Integer, Integer> extractNewMatch(GRBModel model, HashMap<Integer, Integer> currentMapping) throws GRBException {
+		HashMap<Integer, Integer> newMatch = new HashMap<>();
+		ArrayList<Integer> clusters = null;
 		
-		return hash;
+		clusters = new ArrayList<>(currentMapping.keySet());
+		for(int i = 0; i < clusters.size(); i++) {
+			for(int j = 0; j < clusters.size(); j++) {
+				if(modelVars[i][j].get(GRB.DoubleAttr.X) > 0.95) {
+                	int sourceNode = currentMapping.get(clusters.get(i));
+                	newMatch.put(clusters.get(j), sourceNode);
+                }
+			}
+		}
+		
+		return newMatch;
 	}
 	
 	private void addObjectiveFunction(ArrayList<Integer> clusters, double[][] benefits) throws GRBException {
@@ -85,6 +98,18 @@ public class EmparelhamentoPerfeito {
 				expr.addTerm(1.0, modelVars[i][j]);
 			}
 			model.addConstr(expr, GRB.EQUAL, 1.0, "c" + Integer.toString(j));
+		}
+	}
+	
+	private void addOnlyOneTargetClusterRestriction2(ArrayList<Integer> clusters) throws GRBException {
+		GRBLinExpr expr;
+		
+		for(int i = 0; i < clusters.size(); i++) {
+			expr = new GRBLinExpr();
+			for(int j = 0; j < clusters.size(); j++) {
+				expr.addTerm(1.0, modelVars[i][j]);
+			}
+			model.addConstr(expr, GRB.EQUAL, 1.0, "c" + Integer.toString(i));
 		}
 	}
 	
@@ -136,5 +161,34 @@ public class EmparelhamentoPerfeito {
 		chromosome.updateClusterControls(targetNode);
 		
 		return canMigrate;
+	}
+	
+	public void applyPerfectMatch(CCPChromosome chromosome) {
+		HashMap<Integer, Integer> clusterMapping;
+		HashMap<Integer, Integer> newClusterMapping;
+		
+		clusterMapping = localSearch.selectNodeCluster(CCPParameters.PERFECT_MATCH_NUMBER_CLUSTERS, chromosome);
+		try {
+			newClusterMapping = computePerfectMatch(clusterMapping, chromosome);
+			applyNewNodesMappingPerfectMatch(newClusterMapping, chromosome);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void applyNewNodesMappingPerfectMatch(HashMap<Integer, Integer> newClusterMapping, CCPChromosome chromosome) throws Exception {
+		ArrayList<Integer> nodes;
+		
+		nodes = new ArrayList<Integer>(newClusterMapping.values());
+		for(int i = 0; i < nodes.size(); i++) {
+			chromosome.removeNodeFromCluster(nodes.get(i), false);
+		}
+		
+		for(Entry<Integer, Integer> entry : newClusterMapping.entrySet()) {
+			Integer node = entry.getValue();
+			Integer cluster = entry.getKey();
+			chromosome.moveNodeCluster(node, cluster);
+		}
 	}
 }
