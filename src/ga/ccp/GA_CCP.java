@@ -313,7 +313,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		return offsprings;
 	}
 
-	private CCPChromosome generateRandomChromosome() throws Exception {
+	public CCPChromosome generateRandomChromosome() throws Exception {
 		CCPChromosome chromosome = new CCPChromosome(instance);
 		ArrayList<ArrayList<Integer>> nodesByCluster = new ArrayList<>(instance.getK());
 		ArrayList<Double> clustersCurrentWeight = new ArrayList<>(instance.getK());

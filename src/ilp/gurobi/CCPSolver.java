@@ -48,6 +48,7 @@ public class CCPSolver {
 	}
 	
 	public void newModel() throws Exception {
+		this.env = new GRBEnv();
 		this.model = new GRBModel(env); 
 	}
 	
@@ -117,7 +118,7 @@ public class CCPSolver {
         for(int i = 0; i < n; i++) {
             for(int k = 0; k < p; k++) {
             	variableValue = solution[i] == k ? 1.0 : 0.0;
-                elements[i][k] = model.addVar(0.0, 1.0, variableValue, GRB.BINARY, "x" + Integer.toString(i) + "_" + Integer.toString(k));
+                elements[i][k] = model.addVar(0.0, 1.0, 0.0, GRB.BINARY, "x" + Integer.toString(i) + "_" + Integer.toString(k));
             }
         }
     }

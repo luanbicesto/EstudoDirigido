@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 import ga.ccp.CCPChromosome;
+import ga.ccp.Common;
 
 public abstract class AbstractGA<C extends Chromosome> {
 
@@ -13,7 +14,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	protected int popSize;
 	protected double mutationRate;
 	protected C bestChromosome;
-	protected final Random rng = new Random(0);
+	protected final Random rng = new Random(1);
 	// protected final Random rng2 = new Random(1);
 	private boolean verbose = true;
 	protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
@@ -45,7 +46,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 		Population<C> population = initializePopulation();
 		bestChromosome = getBestChromosome(population);
 
-		for (int g = 1; g <= generations && getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
+		for (int g = 1; g <= generations && Common.getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
 			// applyLocalSearch(population);
 			Population<C> parents = selectParents(population);
 			Population<C> offsprings = crossover(parents);
@@ -70,7 +71,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 
 		applyLocalSearch(bestChromosome, true);
 		((CCPChromosome) bestChromosome).verifyFitness();
-		System.out.println("Time = " + getRunningTime(startTime) + " seg");
+		System.out.println("Time = " + Common.getRunningTime(startTime) + " seg");
 		return bestChromosome;
 	}
 
@@ -139,10 +140,4 @@ public abstract class AbstractGA<C extends Chromosome> {
 		}
 	}
 
-	private double getRunningTime(long startTime) {
-		long endTime = System.currentTimeMillis();
-		long totalTime = endTime - startTime;
-
-		return (double) totalTime / (double) 1000;
-	}
 }

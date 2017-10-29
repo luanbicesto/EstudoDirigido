@@ -3,13 +3,12 @@ package ilp.gurobi;
 import common.instance.reader.CCPInstanceEntity;
 import common.instance.reader.InstanceReader;
 import ga.ccp.CCPChromosome;
+import ga.ccp.Common;
 import ga.ccp.GA_CCP;
-import gurobi.GRBEnv;
-import gurobi.GRBModel;
+import ga.framework.Chromosome;
+import sun.awt.image.PNGImageDecoder.Chromaticities;
 
 public class MathHeuristic {
-	private GRBEnv env;
-    private GRBModel model;
     CCPSolver ccpSolver;
     
 	public static void main(String[] args) throws Exception {
@@ -22,8 +21,10 @@ public class MathHeuristic {
 		CCPInstanceEntity instance = InstanceReader.readerInstance(MathHeuristicParameters.INSTANCE_TYPE,
 				MathHeuristicParameters.INSTANCE_NAME);
 		GA_CCP ccp = new GA_CCP(instance);
-		bestSolution = (CCPChromosome)ccp.solve();
-		applyMathHeuristic(bestSolution.getCodification());
+		//bestSolution = (CCPChromosome)ccp.solve();
+		bestSolution = ccp.generateRandomChromosome();
+		System.out.println("Initial fitness: " + bestSolution.getFitness());
+		applyMathHeuristic(bestSolution.getCodification(), bestSolution);
 	}
 	
 	public Integer[] solve(CCPSolver ccpSolver, Integer[] currentSolution) throws Exception {
@@ -38,12 +39,19 @@ public class MathHeuristic {
         return ccpSolver.getSolution();
 	}
 	
-	public void applyMathHeuristic(Integer[] initialSolution) throws Exception {
+	public void applyMathHeuristic(Integer[] initialSolution, CCPChromosome intialChromosome) throws Exception {
 		Integer[] lastBestSolution = initialSolution;
-		
+		long startTime = System.currentTimeMillis();
 		ccpSolver = new CCPSolver();
 		ccpSolver.readInstance(MathHeuristicParameters.INSTANCE_TYPE, MathHeuristicParameters.INSTANCE_NAME);
-		lastBestSolution = solve(ccpSolver, lastBestSolution);
+		
+		while(Common.getRunningTime(startTime) <= MathHeuristicParameters.TOTAL_RUNNING_TIME) {
+			lastBestSolution = solve(ccpSolver, lastBestSolution);
+		}
+		
+		intialChromosome.setCodification(lastBestSolution);
+		double newFitness = intialChromosome.computeFitness(true);
+		System.out.println("Final fitness: " + newFitness);
 	}
 	
 }

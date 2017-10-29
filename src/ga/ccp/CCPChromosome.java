@@ -16,6 +16,10 @@ public class CCPChromosome extends Chromosome {
 		codification = new Integer[instance.getN()];
 		this.instance = instance;
 	}
+	
+	public void setCodification(Integer[] codification) {
+		this.codification = codification;
+	}
 
 	public Integer[] getCodification() {
 		return codification;
@@ -196,7 +200,7 @@ public class CCPChromosome extends Chromosome {
 		this.fitness += improvement;
 	}
 
-	private double computeFitness(boolean computeFromScratch) {
+	public double computeFitness(boolean computeFromScratch) {
 		double fitness = 0.0;
 		for (int k = 0; k < instance.getK(); k++) {
 			fitness += computeClusterContribution(k, computeFromScratch);
