@@ -7,7 +7,6 @@ import java.util.Random;
 import common.instance.reader.CCPInstanceEntity;
 import ga.ccp.CCPParameters.LocalSearchStrategy;
 import ga.framework.GAConfiguration;
-import ilp.gurobi.EmparelhamentoPerfeito;
 
 public class LocalSearchWrapper {
 
@@ -341,7 +340,7 @@ public class LocalSearchWrapper {
 						bestContribution = fitnessDifference;
 						targetCluster = cluster;
 						nodeImproved = true;
-						if (!CCPParameters.BEST_IMPROVING) {
+						if (!CCPParameters.BEST_IMPROVING_ONE_CHANGE) {
 							break;
 						}
 					}
@@ -470,7 +469,7 @@ public class LocalSearchWrapper {
 					if (swapImprovement > bestSwapImprovement) {
 						swapNode = node2;
 						bestSwapImprovement = swapImprovement;
-						if (!CCPParameters.BEST_IMPROVING) {
+						if (!CCPParameters.BEST_IMPROVING_SWAP) {
 							break;
 						}
 					}
