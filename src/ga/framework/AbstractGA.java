@@ -104,12 +104,6 @@ public abstract class AbstractGA<C extends Chromosome> {
 				&& rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
 			numberHybridCromossomes = GAConfiguration.ABSOLUTE_HYBRID_POPULATION;
 
-			if (GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
-				offspringBestChromosome = getBestChromosome(population);
-				applyLocalSearch(offspringBestChromosome, false);
-				numberHybridCromossomes--;
-			}
-
 			if(!GAConfiguration.PARALLEL_LOCAL_SEARCH) {
 				for (int i = 0; i < numberHybridCromossomes; i++) {
 					chromosomeIndex = rng.nextInt(population.size());
@@ -127,6 +121,11 @@ public abstract class AbstractGA<C extends Chromosome> {
 				allChromosomes.parallelStream().forEach(c -> applyLocalSearch(c, false));
 			}
 			
+		}
+		
+		if (GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
+			offspringBestChromosome = getBestChromosome(population);
+			applyLocalSearch(offspringBestChromosome, false);
 		}
 
 		if (GAConfiguration.ENABLE_ORIGINAL_LS_POPULATION
