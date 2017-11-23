@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.Random;
 
 import ga.ccp.CCPChromosome;
+import ga.ccp.CcpRuntimeConfiguration;
+import ga.ccp.CcpRuntimeConfiguration.MOMENT_LOCAL_SEARCH;
 import ga.ccp.Common;
 
 public abstract class AbstractGA<C extends Chromosome> {
@@ -15,8 +17,8 @@ public abstract class AbstractGA<C extends Chromosome> {
 	protected double mutationRate;
 	protected C bestChromosome;
 	protected final Random rng = new Random(1);
-	// protected final Random rng2 = new Random(1);
 	private boolean verbose = true;
+	protected CcpRuntimeConfiguration ccpConfiguration;
 	protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
 
 	public abstract Population<C> initializePopulation();
@@ -34,11 +36,16 @@ public abstract class AbstractGA<C extends Chromosome> {
 	public abstract void applyOriginalLocalSearch(C chromosome, boolean applyToAllNodes);
 
 	public AbstractGA() {
+		this(CcpRuntimeConfiguration.getDefaultConfiguration());
+	}
+	
+	public AbstractGA(CcpRuntimeConfiguration ccpConfiguration) {
 		this.generations = GAConfiguration.NUMBER_GENERATIONS;
 		this.popSize = GAConfiguration.POPULATION_SIZE;
 		this.mutationRate = GAConfiguration.MUTATION_RATE;
+		this.ccpConfiguration = ccpConfiguration;
 	}
-
+	
 	public Chromosome solve() {
 		long startTime = System.currentTimeMillis();
 		C offspringBestChromosome;
@@ -47,14 +54,21 @@ public abstract class AbstractGA<C extends Chromosome> {
 		bestChromosome = getBestChromosome(population);
 
 		for (int g = 1; g <= generations && Common.getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
-			// applyLocalSearch(population);
+			if(ccpConfiguration.getMomentLocalSearch() == MOMENT_LOCAL_SEARCH.BEGINNING) {
+				applyLocalSearch(population);
+			}
+			
 			Population<C> parents = selectParents(population);
 			Population<C> offsprings = crossover(parents);
 			Population<C> mutants = offsprings;
 			if (GAConfiguration.ENABLE_MUTATION) {
 				mutants = mutate(offsprings);
 			}
-			applyLocalSearch(mutants);
+			
+			if(ccpConfiguration.getMomentLocalSearch() == MOMENT_LOCAL_SEARCH.END) {
+				applyLocalSearch(mutants);
+			}
+			
 			Population<C> newpopulation = selectNextPopulation(mutants);
 			population = newpopulation;
 			offspringBestChromosome = getBestChromosome(population);
@@ -100,9 +114,9 @@ public abstract class AbstractGA<C extends Chromosome> {
 		int numberOriginalLsCromossomes = 0;
 		C offspringBestChromosome = null;
 
-		if (GAConfiguration.ENABLE_HYBRID_POPULATION
-				&& rng.nextDouble() < GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION) {
-			numberHybridCromossomes = GAConfiguration.ABSOLUTE_HYBRID_POPULATION;
+		if (ccpConfiguration.isEnableHybridLocalSearch()
+				&& rng.nextDouble() < ccpConfiguration.getPercentageLocalSearch()) {
+			numberHybridCromossomes = ccpConfiguration.getAbsoluteHybridPupulation();
 
 			if(!GAConfiguration.PARALLEL_LOCAL_SEARCH) {
 				for (int i = 0; i < numberHybridCromossomes; i++) {
@@ -120,7 +134,6 @@ public abstract class AbstractGA<C extends Chromosome> {
 				
 				allChromosomes.parallelStream().forEach(c -> applyLocalSearch(c, false));
 			}
-			
 		}
 		
 		if (GAConfiguration.ENABLE_LS_BEST_CHROMOSOME_OFFSPRINGS) {
