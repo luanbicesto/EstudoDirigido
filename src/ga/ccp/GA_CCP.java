@@ -27,7 +27,11 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 	}
 
 	public GA_CCP(CCPInstanceEntity instance) {
-		super();
+		this(instance, CcpRuntimeConfiguration.getDefaultConfiguration());
+	}
+
+	public GA_CCP(CCPInstanceEntity instance, CcpRuntimeConfiguration ccpConfiguration) {
+		super(ccpConfiguration);
 		this.instance = instance;
 		this.localSearch = new LocalSearchWrapper(instance, rng);
 		this.localSearchTypes = new ArrayList<>(CCPParameters.NUMBER_LOCAL_SEARCH_TYPE);
@@ -37,7 +41,7 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 		}
 		this.perfectMatch = new EmparelhamentoPerfeito(instance, rng);
 	}
-
+	
 	@Override
 	public CCPPopulation initializePopulation() {
 		CCPPopulation newPopulation = new CCPPopulation();

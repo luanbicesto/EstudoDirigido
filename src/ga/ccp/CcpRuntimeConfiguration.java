@@ -49,5 +49,38 @@ public class CcpRuntimeConfiguration {
 		return ccpConfiguration;
 	}
 	
+	public static CcpRuntimeConfiguration getGAConfiguration() {
+		CcpRuntimeConfiguration ccpConfiguration = new CcpRuntimeConfiguration();
+		
+		ccpConfiguration.setEnableHybridLocalSearch(false);
+		ccpConfiguration.setPercentageLocalSearch(GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION);
+		ccpConfiguration.setAbsoluteHybridPupulation(GAConfiguration.ABSOLUTE_HYBRID_POPULATION);
+		ccpConfiguration.setMomentLocalSearch(MOMENT_LOCAL_SEARCH.END);
+		
+		return ccpConfiguration;
+	}
+	
+	public static CcpRuntimeConfiguration getHGA1Configuration() {
+		CcpRuntimeConfiguration ccpConfiguration = new CcpRuntimeConfiguration();
+		
+		ccpConfiguration.setEnableHybridLocalSearch(true);
+		ccpConfiguration.setPercentageLocalSearch(GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION);
+		ccpConfiguration.setAbsoluteHybridPupulation(GAConfiguration.ABSOLUTE_HYBRID_POPULATION);
+		ccpConfiguration.setMomentLocalSearch(MOMENT_LOCAL_SEARCH.BEGINNING);
+		
+		return ccpConfiguration;
+	}
+	
+	public static CcpRuntimeConfiguration getHGA2Configuration() {
+		CcpRuntimeConfiguration ccpConfiguration = new CcpRuntimeConfiguration();
+		
+		ccpConfiguration.setEnableHybridLocalSearch(true);
+		ccpConfiguration.setPercentageLocalSearch(GAConfiguration.PERCENTAGE_APPLY_HYBRID_TRANSFORMATION);
+		ccpConfiguration.setAbsoluteHybridPupulation(GAConfiguration.ABSOLUTE_HYBRID_POPULATION);
+		ccpConfiguration.setMomentLocalSearch(MOMENT_LOCAL_SEARCH.END);
+		
+		return ccpConfiguration;
+	}
+	
 	
 }

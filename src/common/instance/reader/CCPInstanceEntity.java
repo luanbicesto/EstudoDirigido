@@ -7,6 +7,7 @@ public class CCPInstanceEntity {
     private double[] nodeWeights;
     private double[] lowerBound;
     private double[] upperBound;
+    private String name;
     
     public int getK() {
         return k;
@@ -72,6 +73,12 @@ public class CCPInstanceEntity {
     public void setUpperBound(double[] upperBound) {
         this.upperBound = upperBound;
     }
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
     
     
 }

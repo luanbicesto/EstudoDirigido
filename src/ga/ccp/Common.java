@@ -26,4 +26,9 @@ public class Common {
 
 		return (double) totalTime / (double) 1000;
 	}
+	
+	public static double round(double number, int decimalPlaces) {
+		double decimalMultiplier = Math.pow(10.0, (double)decimalPlaces);
+		return Math.round(number * decimalMultiplier) / decimalMultiplier;
+	}
 }
