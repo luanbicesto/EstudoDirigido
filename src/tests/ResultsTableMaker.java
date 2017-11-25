@@ -70,31 +70,13 @@ public class ResultsTableMaker {
 	
 	private LineResultTableEntity getResultTableLineForInstance(CCPInstanceEntity instance, double stateOfArtValue) {
 		LineResultTableEntity lineResults = new LineResultTableEntity();
-		lineResults.setGaValue(runGAVersion(instance));
-		lineResults.setHga1Value(runHGA1Version(instance));
-		lineResults.setHga2Value(runHGA2Version(instance));
+		lineResults.setGaValue(Runner.runGAVersion(instance));
+		lineResults.setHga1Value(Runner.runHGA1Version(instance));
+		lineResults.setHga2Value(Runner.runHGA2Version(instance));
 		lineResults.setInstanceName(instance.getName());
 		lineResults.setValueStateOfArt(stateOfArtValue);
 		
 		return lineResults;
 	}
-	
-	private double runGAVersion(CCPInstanceEntity instance) {
-		GA_CCP ccpSolver = new GA_CCP(instance, CcpRuntimeConfiguration.getGAConfiguration());
-		Chromosome bestChromosome = ccpSolver.solve();
-		return bestChromosome.getFitness();
-	}
-	
-	private double runHGA1Version(CCPInstanceEntity instance) {
-		GA_CCP ccpSolver = new GA_CCP(instance, CcpRuntimeConfiguration.getHGA1Configuration());
-		Chromosome bestChromosome = ccpSolver.solve();
-		return bestChromosome.getFitness();
-	}
-	
-	private double runHGA2Version(CCPInstanceEntity instance) {
-		GA_CCP ccpSolver = new GA_CCP(instance, CcpRuntimeConfiguration.getHGA2Configuration());
-		Chromosome bestChromosome = ccpSolver.solve();
-		return bestChromosome.getFitness();
-	}
-	
+
 }

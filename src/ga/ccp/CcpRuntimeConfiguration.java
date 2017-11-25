@@ -12,6 +12,20 @@ public class CcpRuntimeConfiguration {
 	private MOMENT_LOCAL_SEARCH momentLocalSearch;
 	private double percentageLocalSearch;
 	private int absoluteHybridPupulation;
+	private double timeToTargetValue;
+	private int seed;
+	
+	private static final double DEFAULT_TIME_TO_TARGET_VALUE = 0.0;
+	private static final int DEFAULT_SEED = 0;
+	
+	public CcpRuntimeConfiguration() {
+		this(DEFAULT_TIME_TO_TARGET_VALUE, DEFAULT_SEED);
+	}
+	
+	public CcpRuntimeConfiguration(double timeToTargetValue, int seed) {
+		this.timeToTargetValue = timeToTargetValue;
+		this.seed = seed;
+	}
 	
 	public boolean isEnableHybridLocalSearch() {
 		return enableHybridLocalSearch;
@@ -37,7 +51,19 @@ public class CcpRuntimeConfiguration {
 	public void setAbsoluteHybridPupulation(int absoluteHybridPupulation) {
 		this.absoluteHybridPupulation = absoluteHybridPupulation;
 	}
-	
+	public double getTimeToTargetValue() {
+		return timeToTargetValue;
+	}
+	public void setTimeToTargetValue(double timeToTargetValue) {
+		this.timeToTargetValue = timeToTargetValue;
+	}
+	public int getSeed() {
+		return seed;
+	}
+	public void setSeed(int seed) {
+		this.seed = seed;
+	}
+
 	public static CcpRuntimeConfiguration getDefaultConfiguration() {
 		CcpRuntimeConfiguration ccpConfiguration = new CcpRuntimeConfiguration();
 		

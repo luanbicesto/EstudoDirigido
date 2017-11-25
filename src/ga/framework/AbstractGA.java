@@ -16,7 +16,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	protected int popSize;
 	protected double mutationRate;
 	protected C bestChromosome;
-	protected final Random rng = new Random(1);
+	protected final Random rng;
 	private boolean verbose = true;
 	protected CcpRuntimeConfiguration ccpConfiguration;
 	protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
@@ -44,6 +44,13 @@ public abstract class AbstractGA<C extends Chromosome> {
 		this.popSize = GAConfiguration.POPULATION_SIZE;
 		this.mutationRate = GAConfiguration.MUTATION_RATE;
 		this.ccpConfiguration = ccpConfiguration;
+		this.rng = new Random(ccpConfiguration.getSeed());
+	}
+	
+	private boolean keepRunningGA(int g, long startTime) {
+		return g <= generations &&
+			   Common.getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME &&
+			   (this.ccpConfiguration.getTimeToTargetValue() <= 0.0 ? true : bestChromosome.getFitness() < this.ccpConfiguration.getTimeToTargetValue());
 	}
 	
 	public Chromosome solve() {
@@ -53,7 +60,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 		Population<C> population = initializePopulation();
 		bestChromosome = getBestChromosome(population);
 
-		for (int g = 1; g <= generations && Common.getRunningTime(startTime) <= GAConfiguration.TOTAL_RUNNING_TIME; g++) {
+		for (int g = 1; keepRunningGA(g, startTime); g++) {
 			if(ccpConfiguration.getMomentLocalSearch() == MOMENT_LOCAL_SEARCH.BEGINNING) {
 				applyLocalSearch(population);
 			}
@@ -83,7 +90,10 @@ public abstract class AbstractGA<C extends Chromosome> {
 			}
 		}
 
-		applyLocalSearch(bestChromosome, true);
+		if(ccpConfiguration.isEnableHybridLocalSearch()) {
+			applyLocalSearch(bestChromosome, true);
+		}
+		
 		((CCPChromosome) bestChromosome).verifyFitness();
 		System.out.println("Time = " + Common.getRunningTime(startTime) + " seg");
 		return bestChromosome;

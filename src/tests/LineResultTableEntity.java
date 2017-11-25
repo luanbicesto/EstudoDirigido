@@ -57,7 +57,7 @@ public class LineResultTableEntity {
 	}
 	
 	public String getLatexResultLine() {
-		return getInstanceName().replaceAll("_", "\\_") + LATEX_COLUMN_SPACE +
+		return getInstanceName().replace("_", "\\_") + LATEX_COLUMN_SPACE +
 			   getValueStateOfArt() + LATEX_COLUMN_SPACE +	
 			   Common.round(getGaValue(), DECIMAL_PLACES) + LATEX_COLUMN_SPACE +
 			   Common.round(getHga1Value(), DECIMAL_PLACES) + LATEX_COLUMN_SPACE +
