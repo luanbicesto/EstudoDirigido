@@ -17,7 +17,7 @@ public abstract class AbstractGA<C extends Chromosome> {
 	protected double mutationRate;
 	protected C bestChromosome;
 	protected final Random rng;
-	private boolean verbose = true;
+	private boolean verbose = false;
 	protected CcpRuntimeConfiguration ccpConfiguration;
 	protected double applyNewPopulationPercentage = GAConfiguration.PERCENTAGE_APPLY_NEW_POPULATION;
 
