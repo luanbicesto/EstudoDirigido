@@ -10,7 +10,7 @@ public class CCPParameters {
 
 	public static final SelectParentsTypeEnum selectParentsType = SelectParentsTypeEnum.Tournament;
 	public static final double PERCENTAGE_SEMI_TOURNAMENT = 0.1;
-	public static final double MAX_PERCENTAGE_LOCUS_CROSSOVER = 0.15;
+	public static final double MAX_PERCENTAGE_LOCUS_CROSSOVER = 0.1;
 	public static final boolean ORDERED_CROSSOVER_ENABLED = false;
 	/* CROSSOVER */
 

@@ -4,7 +4,7 @@ public class GAConfiguration {
     public static final long TOTAL_RUNNING_TIME = 60;
     public static final int NUMBER_GENERATIONS = 192000;
     public static final int POPULATION_SIZE = 100;
-    public static final double MUTATION_RATE = 1 / (double)POPULATION_SIZE;
+    public static final double MUTATION_RATE = 0.7 / (double)POPULATION_SIZE;
     public static final double CROSSOVER_PERCENTAGE = 1;
     public static final double MUTATION_PERCENTAGE = 1;
     public static boolean ENABLE_MUTATION_SWAP = false;

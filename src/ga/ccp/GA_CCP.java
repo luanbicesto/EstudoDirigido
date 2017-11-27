@@ -98,15 +98,6 @@ public class GA_CCP extends AbstractGA<CCPChromosome> {
 
 		return offspring;
 	}
-	
-	private CCPPopulation duplicatePopulation(CCPPopulation population) {
-		CCPPopulation duplicatedPop = new CCPPopulation();
-		for(int i = 0; i < population.size(); i++) {
-			duplicatedPop.add(population.get(i).clone());
-		}
-		
-		return duplicatedPop;
-	}
 
 	private void createOffspring(Population<CCPChromosome> parents, CCPPopulation offspring,
 			double maxNumberLocusCrossover) {
