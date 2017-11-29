@@ -23,26 +23,26 @@ public class ResultsTableMaker {
 	private static ArrayList<Object[]> buildRanReal240BestResultsInstanceSet() {
 		ArrayList<Object[]> instanceSet = new ArrayList<>();
 		
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_01", 223220.90});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_02", 202095.20});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_03", 196391.99});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_01", 222931.65});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_02", 201691.73});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_03", 196199.95});
 		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_04", 222711.88});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_05", 193570.70});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_06", 214707.61});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_07", 207115.03});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_08", 202820.87});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_09", 207004.32});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_10", 190248.29});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_11", 202692.08});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_12", 199006.57});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_13", 199766.31});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_14", 226724.31});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_15", 189022.16});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_16", 202272.69});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_17", 192878.67});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_18", 192747.90});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_19", 197005.23});
-		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_20", 210331.30});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_05", 192892.46});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_06", 214256.87});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_07", 206830.64});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_08", 202576.92});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_09", 206739.99});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_10", 189846.25});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_11", 202179.11});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_12", 198691.78});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_13", 199484.53});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_14", 226584.34});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_15", 188426.05});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_16", 201554.40});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_17", 192373.26});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_18", 192334.36});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_19", 196657.15});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_20", 209825.28});
 		
 		return instanceSet;
 	}

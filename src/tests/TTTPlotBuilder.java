@@ -61,7 +61,7 @@ public class TTTPlotBuilder {
 		XYDataset dataset = createDataset(runningTimes);
 		JFreeChart tttPlotchart = createChart(dataset);
 		new File("TTTPlot.png").delete();
-		ChartUtilities.saveChartAsPNG(new File("TTTPlot.png"), tttPlotchart, 450, 400);
+		ChartUtilities.saveChartAsPNG(new File("TTTPlot.png"), tttPlotchart, 800, 800);
 	}
 	
 	private String getChartName() {
@@ -69,7 +69,7 @@ public class TTTPlotBuilder {
 	}
 	
 	private JFreeChart createChart(final XYDataset dataset) {
-		JFreeChart chart = ChartFactory.createXYLineChart(
+		JFreeChart chart = ChartFactory.createScatterPlot(
 				getChartName(), 
                 "Running time (s)", 
                 "Probability", 
