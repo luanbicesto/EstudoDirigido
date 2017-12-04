@@ -73,28 +73,28 @@ public class TTTPlotBuilder {
 				getChartName(), 
                 "Running time (s)", 
                 "Probability", 
-                dataset, 
-                PlotOrientation.VERTICAL,
+                dataset 
+                /*PlotOrientation.VERTICAL,
                 true, 
                 true, 
-                false
+                false*/
         );
 		
 		XYPlot plot = chart.getXYPlot();
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        /*XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         
         renderer.setSeriesPaint(0, Color.RED);
-        renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+        //renderer.setSeriesStroke(0, new BasicStroke(1.0f));
         
         renderer.setSeriesPaint(1, Color.BLUE);
-        renderer.setSeriesStroke(1, new BasicStroke(2.0f));        
+        //renderer.setSeriesStroke(1, new BasicStroke(1.0f));        
 
         if(RUN_GA_VERSION) {
         	renderer.setSeriesPaint(2, Color.GREEN);
             renderer.setSeriesStroke(2, new BasicStroke(2.0f));
         }
         
-        plot.setRenderer(renderer);
+        plot.setRenderer(renderer);*/
         plot.setBackgroundPaint(Color.white);
 
         plot.setRangeGridlinesVisible(false);
