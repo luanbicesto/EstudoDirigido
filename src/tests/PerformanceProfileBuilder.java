@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.jfree.chart.ChartFactory;
@@ -26,11 +27,11 @@ public class PerformanceProfileBuilder {
 	
 	public void buildPerformanceProfileChart() throws IOException {
 		ArrayList<ArrayList<Double>> heuristicsResults = getHeuristicsResults();
-		ArrayList<ArrayList<Double>> heuristicsDeviations = computeDeviationEachHeuristic(heuristicsResults, heuristicsResults.size());
+		ArrayList<ArrayList<Double>> heuristicsDeviations = computeDeviationEachHeuristic(heuristicsResults, heuristicsResults.get(0).size());
 		XYDataset dataset = createDataset(heuristicsDeviations, getHeuristicsNames());
 		JFreeChart performanceProfileChart = createChart(dataset);
 		new File("PerformanceProfile.png").delete();
-		ChartUtilities.saveChartAsPNG(new File("TTTPlot.png"), performanceProfileChart, 800, 800);
+		ChartUtilities.saveChartAsPNG(new File("PerformanceProfile.png"), performanceProfileChart, 800, 800);
 	}
 	
 	private ArrayList<ArrayList<Double>> getHeuristicsResults(){
@@ -38,13 +39,59 @@ public class PerformanceProfileBuilder {
 		ArrayList<ArrayList<Double>> heuristicsResults = new ArrayList<>(heuristicQty);
 		
 		ArrayList<Double> heuristicResult = new ArrayList<>();
+		//VND - 240
+		heuristicResult.add(222931.65);
+		heuristicResult.add(201691.73);
+		heuristicResult.add(196199.95);
+		heuristicResult.add(222455.67);
+		heuristicResult.add(192892.46);
+		heuristicResult.add(214256.87);
+		heuristicResult.add(206830.64);
+		heuristicResult.add(202576.92);
+		heuristicResult.add(206739.99);
+		heuristicResult.add(189846.25);
+		heuristicResult.add(202179.11);
+		heuristicResult.add(198691.78);
+		heuristicResult.add(199484.53);
+		heuristicResult.add(226584.34);
+		heuristicResult.add(188426.05);
+		heuristicResult.add(201554.40);
+		heuristicResult.add(192373.26);
+		heuristicResult.add(192334.36);
+		heuristicResult.add(196657.15);
+		heuristicResult.add(209825.28);
+		heuristicsResults.add(heuristicResult);
+		
+		heuristicResult = new ArrayList<>();
+		//HGA1 - 240
+		heuristicResult.add(221617.75);
+		heuristicResult.add(201381.85);
+		heuristicResult.add(194689.96);
+		heuristicResult.add(222798.51);
+		heuristicResult.add(192273.5);
+		heuristicResult.add(213933.56);
+		heuristicResult.add(205502.39);
+		heuristicResult.add(200003.86);
+		heuristicResult.add(207157.41);
+		heuristicResult.add(187164.73);
+		heuristicResult.add(202354.02);
+		heuristicResult.add(197170.57);
+		heuristicResult.add(200281.55);
+		heuristicResult.add(227205.94);
+		heuristicResult.add(183158.31);
+		heuristicResult.add(201710.69);
+		heuristicResult.add(192107.58);
+		heuristicResult.add(191628.91);
+		heuristicResult.add(195699.22);
+		heuristicResult.add(206928.35);
+		heuristicsResults.add(heuristicResult);
 		
 		
 		return heuristicsResults;
 	}
 	
 	private ArrayList<String> getHeuristicsNames(){
-		return new ArrayList<>();
+		return new ArrayList<String>(Arrays.asList("VND", "HGA1"));
 	}
 	
 	private String getChartName() {
@@ -121,9 +168,9 @@ public class PerformanceProfileBuilder {
 	}
 	
 	private ArrayList<ArrayList<Double>> computeDeviationEachHeuristic(ArrayList<ArrayList<Double>> heuristicsResults, int instancesQty) {
-		ArrayList<ArrayList<Double>> heuristicsDeviations = new ArrayList<>();
+		ArrayList<ArrayList<Double>> heuristicsDeviations = new ArrayList<>(heuristicsResults.size());
 		
-		initializeMatrix(heuristicsDeviations);
+		initializeMatrix(heuristicsDeviations, heuristicsResults.size());
 		for(int i = 0; i < instancesQty; i++) {
 			setDeviationsSpecificInstance(heuristicsResults, heuristicsDeviations, i);
 		}
@@ -140,19 +187,17 @@ public class PerformanceProfileBuilder {
 		for(int heuristicIndex = 0; heuristicIndex < heuristicsResults.size(); heuristicIndex++) {
 			heuristicDeviation = heuristicsDeviations.get(heuristicIndex);
 			heuristResult = heuristicsResults.get(heuristicIndex).get(instanceIndex);
-			heuristicDeviation.set(instanceIndex, getDeviation(heuristResult, maxResultHeuristics));
+			heuristicDeviation.add(getDeviation(heuristResult, maxResultHeuristics));
 		}
 	}
 	
 	private double getDeviation(double instanceResult, double maxResult) {
-		return (maxResult - instanceResult) / maxResult;
+		return ((maxResult - instanceResult) / maxResult) * 100.0;
 	}
 	
-	private void initializeMatrix(ArrayList<ArrayList<Double>> matrix) {
-		int matrixSize = matrix.size();
-		
-		for(int i = 0; i < matrixSize; i++) {
-			matrix = new ArrayList<>();
+	private void initializeMatrix(ArrayList<ArrayList<Double>> matrix, int size) {
+		for(int i = 0; i < size; i++) {
+			matrix.add(new ArrayList<>());
 		}
 	}
 	
