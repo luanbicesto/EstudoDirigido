@@ -16,7 +16,7 @@ public class ResultsTableMaker {
 		ResultsTableMaker resultsTableMaker = new ResultsTableMaker();
 		String resultTable = "";
 		
-		resultTable = resultsTableMaker.getResultTableForInstances(buildRanReal240BestResultsInstanceSet());
+		resultTable = resultsTableMaker.getResultTableForInstances(buildRanReal480BestResultsInstanceSet());
 		System.out.println(resultTable);
 	}
 	
@@ -43,6 +43,33 @@ public class ResultsTableMaker {
 		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_18", 192334.36});
 		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_19", 196657.15});
 		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal240, "RanReal240_20", 209825.28});
+		
+		return instanceSet;
+	}
+	
+	private static ArrayList<Object[]> buildRanReal480BestResultsInstanceSet() {
+		ArrayList<Object[]> instanceSet = new ArrayList<>();
+		
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_01", 547892.82});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_02", 502322.88});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_03", 486391.16});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_04", 513016.49});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_05", 474143.57});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_06", 523003.55});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_07", 536212.13});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_08", 523419.36});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_09", 548621.16});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_10", 511338.69});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_11", 516058.83});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_12", 491899.13});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_13", 524255.44});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_14", 505311.16});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_15", 508386.57});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_16", 541827.80});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_17", 529671.66});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_18", 516230.55});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_19", 514385.62});
+		instanceSet.add(new Object[] {InstanceReader.InstanceType.RanReal480, "RanReal480_20", 508986.95});
 		
 		return instanceSet;
 	}
